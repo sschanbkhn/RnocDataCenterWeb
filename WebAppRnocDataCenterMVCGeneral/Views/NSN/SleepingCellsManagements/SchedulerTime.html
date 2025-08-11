@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Lịch Trình</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 40% 80%, rgba(120, 219, 226, 0.3) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .main-container {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            padding: 30px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .header-title:hover {
+            transform: translateY(-2px);
+            text-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+        }
+
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin-top: 8px;
+            font-weight: 400;
+        }
+
+        .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            margin: 0;
+            border-radius: 0;
+        }
+
+        .section-title {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+		
+		
+		
+		
+		/* Search and Add Button Section */
+        .control-section {
+            background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            background: white;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+            transform: translateY(-1px);
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+        }
+		
+		
+		
+		/* Enhanced Table Styling */
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .table {
+            margin: 0;
+            border: none;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #4c51bf, #667eea) !important;
+            color: white !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            padding: 20px;
+            border: none;
+            position: relative;
+            transition: all 0.3s ease;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table thead th:hover {
+            background: linear-gradient(135deg, #4338ca, #5b21b6) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 56, 202, 0.3);
+        }
+
+        .table thead th i {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        .table tbody td {
+            padding: 18px 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background: white;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+            border-radius: 12px;
+        }
+
+        .table tbody tr:hover td {
+            color: #3730a3 !important;
+            font-weight: 500;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table thead th:first-child {
+            border-top-left-radius: 20px;
+        }
+
+        .table thead th:last-child {
+            border-top-right-radius: 20px;
+        }
+		
+		
+		/* Enhanced Cell Styling */
+        .end-time-cell {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 8px;
+            padding: 8px 12px !important;
+            font-weight: 500;
+            color: #0369a1;
+            font-size: 0.95rem;
+        }
+
+        .stt-cell {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #7c3aed;
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+
+
+.start-time-cell {
+    font-family: 'Monaco', 'Menlo', monospace;
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    border-radius: 8px;
+    padding: 8px 12px !important;
+    font-weight: 500;
+    color: #5b21b6;
+    font-size: 0.95rem;
+}
+
+.time-cell {
+    font-family: 'Monaco', 'Menlo', monospace;
+    background: linear-gradient(135deg, #fed7aa, #fdba74);
+    border-radius: 8px;
+    padding: 8px 12px !important;
+    font-weight: 500;
+    color: #c2410c;
+    font-size: 0.95rem;
+    border: 2px solid #f97316;
+}
+
+
+
+
+        /* Enhanced Status Badges */
+        .badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .badge:hover::before {
+            left: 100%;
+        }
+
+        .bg-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .bg-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+		
+		
+		/* Enhanced Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 10px 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .icon-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            transition: left 0.3s;
+        }
+
+        .icon-btn:hover::before {
+            left: 100%;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .icon-btn.edit {
+            color: #f59e0b;
+            border-color: #fbbf24;
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+        }
+
+        .icon-btn.edit:hover {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border-color: #f59e0b;
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .icon-btn.delete {
+            color: #ef4444;
+            border-color: #fca5a5;
+            background: linear-gradient(135deg, #fef2f2, #fecaca);
+        }
+
+        .icon-btn.delete:hover {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border-color: #ef4444;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+		
+		
+		/* Pagination and Controls */
+        .table-controls {
+            background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .pagination .btn {
+            margin: 0 3px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            color: #4a5568;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: #667eea;
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .pagination .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        /* Modal Styling */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 25px 30px;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+        }
+
+        .modal-body {
+            padding: 30px;
+            background: #fafafa;
+        }
+
+        .modal-label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            background: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            border-color: #6b7280;
+            border-radius: 10px;
+            padding: 10px 20px;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Custom datetime input styling */
+        .datetime-input input[type="datetime-local"] {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .datetime-input input[type="datetime-local"]:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container { margin: 10px; }
+            .header-section { padding: 20px; }
+            .header-title { font-size: 2rem; }
+            .content-section { padding: 20px; }
+            .control-section { padding: 20px; }
+            .add-btn { width: 100%; margin-top: 15px; }
+            .table-responsive { border-radius: 20px; }
+            .table thead th { font-size: 0.75rem; padding: 15px 10px; }
+            .table tbody td { padding: 12px 8px; font-size: 0.875rem; }
+            .action-buttons { flex-direction: column; gap: 4px; }
+            .icon-btn { padding: 8px 10px; font-size: 0.875rem; }
+        }
+
+        /* Sortable indicators */
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .sortable:hover {
+            background: linear-gradient(135deg, #4338ca, #5b21b6) !important;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #5a67d8, #6b46c1); }
+
+</style>
+</head>
+
+<body>
+    <div class="container-fluid py-4">
+        <div class="main-container">
+            <div class="header-section">
+                <h1 class="header-title">
+                    <i class="fas fa-clock me-3"></i>
+                    Sleeping Cell Management
+                </h1>
+                <p class="header-subtitle">Advanced NOC1 Automation System</p>
+            </div>
+
+            <div class="content-section">
+                <h3 class="section-title">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Quản Lý Lịch Trình
+                </h3>
+
+                <div class="control-section">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="position-relative">
+                                <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                                <input type="text" id="search" class="form-control search-input ps-5" placeholder="🔍 Tìm kiếm lịch trình...">
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button id="addScheduleBtn" class="btn add-btn">
+                                <i class="fas fa-plus me-2"></i>
+                                Thêm Lịch Trình
+                            </button>
+                        </div>
+                    </div>
+                </div>
+				
+				
+				
+				
+				<div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" id="sortSTT">
+                                        <i class="fas fa-sort-numeric-down"></i>
+                                        STT
+                                    </th>
+                                    <th class="sortable" id="sortStartTime">
+                                        <i class="fas fa-play-circle"></i>
+                                        Start Time
+                                    </th>
+                                    <th class="sortable" id="sortEndTime">
+                                        <i class="fas fa-stop-circle"></i>
+                                        End Time
+                                    </th>
+                                    <th class="sortable" id="sortActive">
+                                        <i class="fas fa-toggle-on"></i>
+                                        Active
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-cogs"></i>
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduleTableBody">
+                                <tr>
+                                    <td><div class="stt-cell">1</div></td>
+                                    <td><div class="start-time-cell">2024-12-19 08:00</div></td>
+                                    <td><div class="end-time-cell">2024-12-19 17:00</div></td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle"></i>
+                                            Active
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="icon-btn edit" title="Chỉnh sửa" data-stt="1">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="icon-btn delete" title="Xóa" data-stt="1">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><div class="stt-cell">2</div></td>
+                                    <td><div class="start-time-cell">2024-12-19 14:00</div></td>
+                                    <td><div class="end-time-cell">2024-12-19 18:00</div></td>
+                                    <td>
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times-circle"></i>
+                                            Inactive
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="icon-btn edit" title="Chỉnh sửa" data-stt="2">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="icon-btn delete" title="Xóa" data-stt="2">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><div class="stt-cell">3</div></td>
+                                    <td><div class="start-time-cell">2024-12-20 09:30</div></td>
+                                    <td><div class="end-time-cell">2024-12-20 16:30</div></td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle"></i>
+                                            Active
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="icon-btn edit" title="Chỉnh sửa" data-stt="3">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="icon-btn delete" title="Xóa" data-stt="3">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+				
+				
+				<div class="table-controls">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <label for="rowsPerPage" class="form-label me-3 mb-0 fw-semibold">
+                                    <i class="fas fa-list me-2"></i>Hiển thị:
+                                </label>
+                                <select id="rowsPerPage" class="form-select" style="width: auto;">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="ms-2 text-muted">dòng</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <nav class="d-flex justify-content-end">
+                                <div class="pagination mb-0" id="pagination">
+                                    <button class="btn btn-outline-primary">‹</button>
+                                    <button class="btn btn-primary">1</button>
+                                    <button class="btn btn-outline-primary">2</button>
+                                    <button class="btn btn-outline-primary">3</button>
+                                    <button class="btn btn-outline-primary">›</button>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	
+	
+	
+	<!-- Modal -->
+    <div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Thêm Lịch Trình
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label modal-label">
+                                    <i class="fas fa-sort-numeric-up me-2"></i>
+                                    STT
+                                </label>
+                                <input type="number" id="stt" class="form-control" min="1" placeholder="Nhập số thứ tự" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label modal-label">
+                                    <i class="fas fa-toggle-on me-2"></i>
+                                    Trạng Thái
+                                </label>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="active">
+                                    <label class="form-check-label fw-semibold">
+                                        Kích hoạt lịch trình
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+					
+					
+					
+					
+					
+					<div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label modal-label">
+                                    <i class="fas fa-play-circle me-2"></i>
+                                    Start Time
+                                </label>
+                                <div class="datetime-input">
+                                    <input type="datetime-local" id="startTime" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label modal-label">
+                                    <i class="fas fa-stop-circle me-2"></i>
+                                    End Time
+                                </label>
+                                <div class="datetime-input">
+                                    <input type="datetime-local" id="endTime" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        Hủy
+                    </button>
+                    <button type="button" class="btn btn-success" id="saveSchedule">
+                        <i class="fas fa-save me-2"></i>
+                        Lưu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	
+	<!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+        let scheduleData = [];
+        let editingIndex = -1;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize with sample data
+            scheduleData = [
+                { stt: 1, startTime: '2024-12-19T08:00', endTime: '2024-12-19T17:00', active: true },
+                { stt: 2, startTime: '2024-12-19T14:00', endTime: '2024-12-19T18:00', active: false },
+                { stt: 3, startTime: '2024-12-20T09:30', endTime: '2024-12-20T16:30', active: true }
+            ];
+
+            // Add button functionality
+            document.getElementById('addScheduleBtn').addEventListener('click', function() {
+                editingIndex = -1;
+                document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle me-2"></i>Thêm Lịch Trình';
+                clearModalForm();
+                showModal();
+            });
+
+            // Save schedule functionality
+            document.getElementById('saveSchedule').addEventListener('click', function() {
+                saveSchedule();
+            });
+
+            // Search functionality
+            document.getElementById('search').addEventListener('input', function() {
+                filterTable(this.value);
+            });
+
+            // Initialize table
+            renderTable();
+            attachEventListeners();
+        });
+
+        function clearModalForm() {
+            document.getElementById('stt').value = '';
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+            document.getElementById('active').checked = false;
+        }
+
+        function showModal() {
+            var modal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+            modal.show();
+        }
+
+        function hideModal() {
+            var modal = bootstrap.Modal.getInstance(document.getElementById('scheduleModal'));
+            modal.hide();
+        }
+		
+		
+		
+		
+		
+		
+		
+		
+		function saveSchedule() {
+            var stt = parseInt(document.getElementById('stt').value);
+            var startTime = document.getElementById('startTime').value;
+            var endTime = document.getElementById('endTime').value;
+            var active = document.getElementById('active').checked;
+
+            if (!stt || !startTime || !endTime) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+
+            if (new Date(startTime) >= new Date(endTime)) {
+                alert('Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc!');
+                return;
+            }
+
+            var scheduleItem = {
+                stt: stt,
+                startTime: startTime,
+                endTime: endTime,
+                active: active
+            };
+
+            if (editingIndex >= 0) {
+                scheduleData[editingIndex] = scheduleItem;
+            } else {
+                // Check for duplicate STT
+                if (scheduleData.some(item => item.stt === stt)) {
+                    alert('STT đã tồn tại! Vui lòng chọn STT khác.');
+                    return;
+                }
+                scheduleData.push(scheduleItem);
+            }
+
+            renderTable();
+            hideModal();
+            attachEventListeners();
+            alert('Lịch trình đã được lưu thành công!');
+        }
+
+        function formatDateTime(dateTimeStr) {
+            var date = new Date(dateTimeStr);
+            return date.toLocaleString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).replace(',', '');
+        }
+
+        function renderTable() {
+            var tbody = document.getElementById('scheduleTableBody');
+            tbody.innerHTML = '';
+
+            scheduleData.forEach((item, index) => {
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><div class="stt-cell">${item.stt}</div></td>
+<td><div class="start-time-cell">${formatDateTime(item.startTime)}</div></td>
+<td><div class="end-time-cell">${formatDateTime(item.endTime)}</div></td>
+                    <td>
+                        <span class="badge ${item.active ? 'bg-success' : 'bg-danger'}">
+                            <i class="fas ${item.active ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                            ${item.active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="icon-btn edit" title="Chỉnh sửa" data-index="${index}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="icon-btn delete" title="Xóa" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+		
+		
+		
+		
+		
+		function attachEventListeners() {
+            // Edit button functionality
+            document.querySelectorAll('.icon-btn.edit').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var index = parseInt(this.getAttribute('data-index'));
+                    editingIndex = index;
+                    var item = scheduleData[index];
+                    
+                    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Chỉnh Sửa Lịch Trình';
+                    document.getElementById('stt').value = item.stt;
+                    document.getElementById('startTime').value = item.startTime;
+                    document.getElementById('endTime').value = item.endTime;
+                    document.getElementById('active').checked = item.active;
+                    
+                    showModal();
+                });
+            });
+
+            // Delete button functionality
+            document.querySelectorAll('.icon-btn.delete').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var index = parseInt(this.getAttribute('data-index'));
+                    if (confirm('Bạn có chắc chắn muốn xóa lịch trình này?')) {
+                        scheduleData.splice(index, 1);
+                        renderTable();
+                        attachEventListeners();
+                    }
+                });
+            });
+
+            // Sort functionality
+            document.querySelectorAll('.sortable').forEach(function(header) {
+                header.addEventListener('click', function() {
+                    var sortBy = this.id.replace('sort', '').toLowerCase();
+                    sortTable(sortBy);
+                });
+            });
+        }
+
+        function filterTable(searchTerm) {
+            var filteredData = scheduleData.filter(item => {
+                return item.stt.toString().includes(searchTerm) ||
+                       formatDateTime(item.startTime).toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       formatDateTime(item.endTime).toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       (item.active ? 'active' : 'inactive').includes(searchTerm.toLowerCase());
+            });
+            
+            renderFilteredTable(filteredData);
+        }
+
+        function renderFilteredTable(data) {
+            var tbody = document.getElementById('scheduleTableBody');
+            tbody.innerHTML = '';
+
+            data.forEach((item, index) => {
+                var originalIndex = scheduleData.findIndex(orig => 
+                    orig.stt === item.stt && orig.startTime === item.startTime
+                );
+                
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><div class="stt-cell">${item.stt}</div></td>
+<td><div class="start-time-cell">${formatDateTime(item.startTime)}</div></td>
+<td><div class="end-time-cell">${formatDateTime(item.endTime)}</div></td>
+                    <td>
+                        <span class="badge ${item.active ? 'bg-success' : 'bg-danger'}">
+                            <i class="fas ${item.active ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                            ${item.active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="icon-btn edit" title="Chỉnh sửa" data-index="${originalIndex}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="icon-btn delete" title="Xóa" data-index="${originalIndex}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            attachEventListeners();
+        }
+
+        function sortTable(sortBy) {
+            scheduleData.sort((a, b) => {
+                if (sortBy === 'stt') {
+                    return a.stt - b.stt;
+                } else if (sortBy === 'starttime') {
+                    return new Date(a.startTime) - new Date(b.startTime);
+                } else if (sortBy === 'endtime') {
+                    return new Date(a.endTime) - new Date(b.endTime);
+                } else if (sortBy === 'active') {
+                    return b.active - a.active;
+                }
+                return 0;
+            });
+            
+            renderTable();
+            attachEventListeners();
+        }
+    </script>
+</body>
+</html>
+		

@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Services\Implementations\NSN\SleepingCell\ImplementationResetService_1.cs" />
+    <Compile Remove="Services\Implementations\NSN\SleepingCell\ImplementationResetService_2.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Ericsson\Declare5G\" />
+    <Folder Include="Models\Ericsson\SleepingCellsManagements\" />
+    <Folder Include="Models\NSN\Declare5G\" />
+    <Folder Include="Models\NSN\SleepingCellsManagements\" />
+    <Folder Include="Models\OSS\DCAP\" />
+    <Folder Include="Models\ThuVien\" />
+    <Folder Include="Models\Reports\" />
+    <Folder Include="Services\Implementations\Ericsson\" />
+    <Folder Include="Services\Interfaces\Ericsson\" />
+    <Folder Include="Validators\Ericsson\Declare5G\" />
+    <Folder Include="Validators\Ericsson\SleepingCellsManagements\" />
+    <Folder Include="Validators\NSN\Declare5G\" />
+    <Folder Include="Validators\NSN\SleepingCellsManagements\" />
+    <Folder Include="Validators\OSS\DCAP\" />
+    <Folder Include="Validators\Reports\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="SSH.NET" Version="2025.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClassLibraryRnocDataCenterWebDataClass\ClassLibraryRnocDataCenterWebDataClass.csproj" />
+  </ItemGroup>
+
+</Project>

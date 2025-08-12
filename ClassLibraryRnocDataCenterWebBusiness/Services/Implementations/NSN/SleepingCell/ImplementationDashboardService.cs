@@ -536,11 +536,130 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
         {
             try
             {
+                Console.WriteLine($"🔍 API called with endDate: {endDate}");
+
+                DateOnly actualEndDate;
+                if (!string.IsNullOrEmpty(endDate))
+                {
+                    if (!DateOnly.TryParse(endDate, out actualEndDate))
+                    {
+                        Console.WriteLine($"❌ Failed to parse endDate: {endDate}");
+                        return new SleepingCellTrendResponse
+                        {
+                            Success = false,
+                            Data = new List<SleepingCellDayData>(),
+                            Summary = null
+                        };
+                    }
+                }
+                else
+                {
+                    actualEndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-1));
+                }
+
+                var actualStartDate = actualEndDate.AddDays(-13);
+                Console.WriteLine($"📅 Query range: {actualStartDate} to {actualEndDate}");
+
+                // ✅ SỬA: Thay vì query Objtablesleepingcelllogs, 
+                // dùng lại logic từ các methods có sẵn
+                var data = new List<SleepingCellDayData>();
+
+                for (int i = 0; i < 14; i++)
+                {
+                    var currentDate = actualStartDate.AddDays(i);
+                    var isCurrentDate = currentDate == DateOnly.FromDateTime(DateTime.Today);
+
+                    Console.WriteLine($"📅 Processing date: {currentDate}");
+
+                    try
+                    {
+                        // ✅ REUSE: Dùng lại existing methods
+                        var todayAnalysis = await GetTodayAnalysisCount(currentDate, isCurrentDate);
+                        var sleepingCells = await GetSleepingCellsCount(currentDate, isCurrentDate);
+                        var processCells = await GetProcessing_CellsCount(currentDate, isCurrentDate);
+                        var executionCells = await GetExecutionCellsCount(currentDate);
+                        var recheckCells = await GetRecheckCellsCount(currentDate);
+
+                        // Calculate success rate
+                        var successRate = processCells > 0 ?
+                            Math.Round((double)executionCells / processCells * 100.0, 1) : 0.0;
+
+                        var dayData = new SleepingCellDayData
+                        {
+                            Date = currentDate.ToString("yyyy-MM-dd"),
+                            TodayAnalysis = todayAnalysis,
+                            SleepingCells = sleepingCells,
+                            ProcessCells_ = processCells,
+                            ExecutionCells = executionCells,
+                            RecheckCells = recheckCells,
+                            SuccessRate = successRate
+                        };
+
+                        data.Add(dayData);
+                        Console.WriteLine($"✅ {currentDate}: Sleeping={sleepingCells}, Process={processCells}, Execution={executionCells}");
+                    }
+                    catch (Exception dayEx)
+                    {
+                        Console.WriteLine($"⚠️ Error processing {currentDate}: {dayEx.Message}");
+
+                        // Add zero data for failed days instead of crash
+                        data.Add(new SleepingCellDayData
+                        {
+                            Date = currentDate.ToString("yyyy-MM-dd"),
+                            TodayAnalysis = 0,
+                            SleepingCells = 0,
+                            ProcessCells_ = 0,
+                            ExecutionCells = 0,
+                            RecheckCells = 0,
+                            SuccessRate = 0
+                        });
+                    }
+                }
+
+                // Calculate summary
+                var validData = data.Where(x => x.SleepingCells > 0 || x.ProcessCells_ > 0).ToList();
+                var summary = new SleepingCellSummary
+                {
+                    TotalDays = validData.Count,
+                    AvgSleepingCells = validData.Count > 0 ? Math.Round(validData.Average(x => x.SleepingCells), 1) : 0,
+                    AvgSuccessRate = validData.Count > 0 ? Math.Round(validData.Average(x => x.SuccessRate), 1) : 0
+                };
+
+                Console.WriteLine($"✅ Successfully processed {data.Count} days, {validData.Count} valid");
+                Console.WriteLine($"📊 Summary: Avg Sleeping={summary.AvgSleepingCells}, Avg Success Rate={summary.AvgSuccessRate}%");
+
+                return new SleepingCellTrendResponse
+                {
+                    Success = true,
+                    Data = data,
+                    Summary = summary
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"💥 Error in funDashboardServiceGetTrendAsync: {ex.Message}");
+                return new SleepingCellTrendResponse
+                {
+                    Success = false,
+                    Data = new List<SleepingCellDayData>(),
+                    Summary = null
+                };
+            }
+        }
+
+        /*
+
+        public async Task<SleepingCellTrendResponse> funDashboardServiceGetTrendAsync(string? endDate = null)
+        {
+            try
+            {
                 // Lấy 14 ngày gần nhất
                 // var endDate = DateTime.Today;
                 // var startDate = endDate.AddDays(-13); // 14 ngày = today + 13 ngày trước
 
                 // var dateString = selectedDate.ToString("yyyy-MM-dd");
+
+                Console.WriteLine($"🔍 API called with endDate: {endDate}");
 
                 // var result = await _dashboardService.AggregateAndSave14DaysAsync();
                 DateOnly actualEndDate;
@@ -550,6 +669,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 {
                     if (!DateOnly.TryParse(endDate, out actualEndDate))
                     {
+                        Console.WriteLine($"❌ Failed to parse endDate: {endDate}");
                         return new SleepingCellTrendResponse
                         {
                             Success = false,
@@ -565,10 +685,19 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                 var actualStartDate = actualEndDate.AddDays(-13);
 
+                Console.WriteLine($"📅 Query range: {actualStartDate} to {actualEndDate}");
+
+                
                 var rawData = await _context.Objtablesleepingcelllogs
            .Where(x => x.Date >= actualStartDate && x.Date <= actualEndDate)
            .OrderBy(x => x.Date)
            .ToListAsync();
+
+                
+
+        Console.WriteLine($"📊 Found {rawData.Count} records in database");
+
+                var data = new List<SleepingCellDayData>();
 
                 var allDates = Enumerable.Range(0, 14)
                     .Select(i => actualStartDate.AddDays(i))
@@ -639,7 +768,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
         }
         // ket thuc public async Task<SleepingCellTrendResponse> funDashboardServiceGetTrendAsync(string? endDate = null)
 
-
+        */
 
         // Thêm vào ImplementationDashboardService.cs:
 

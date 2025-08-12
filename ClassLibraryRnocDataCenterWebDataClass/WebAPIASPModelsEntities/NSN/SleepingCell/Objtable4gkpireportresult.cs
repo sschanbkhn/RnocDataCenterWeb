@@ -65,4 +65,6 @@ public partial class Objtable4gkpireportresult
     public DateTime? OriginalCreatedAt { get; set; }
 
     public string? ArchivedBy { get; set; }
+
+    public string? ExecutionStatus { get; set; }
 }

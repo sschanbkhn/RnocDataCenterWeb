@@ -200,7 +200,8 @@ namespace ClassLibraryRnocDataCenterWebDataClass.Repositories.Implementations.NS
                     Vendor = detailRecord.Vendor,
                     ArchivedAt = detailRecord.ArchivedAt,
                     OriginalCreatedAt = detailRecord.OriginalCreatedAt,
-                    ArchivedBy = detailRecord.ArchivedBy
+                    ArchivedBy = detailRecord.ArchivedBy,
+                    ExecutionStatus = detailRecord.ExecutionStatus
                 };
 
                 _context.Objtable4gkpireportresults.Add(resultRecord);
@@ -260,7 +261,8 @@ namespace ClassLibraryRnocDataCenterWebDataClass.Repositories.Implementations.NS
                     Vendor = resultRecord.Vendor,
                     ArchivedAt = DateTime.Now, // Update timestamp khi archive
                     OriginalCreatedAt = resultRecord.OriginalCreatedAt,
-                    ArchivedBy = "SYSTEM_ARCHIVE" // Hoặc current user
+                    ArchivedBy = "SYSTEM_ARCHIVE", // Hoặc current user
+                    ExecutionStatus = resultRecord.ExecutionStatus
                 };
 
                 _context.Objtable4gkpireportresultarchives.Add(archiveRecord);

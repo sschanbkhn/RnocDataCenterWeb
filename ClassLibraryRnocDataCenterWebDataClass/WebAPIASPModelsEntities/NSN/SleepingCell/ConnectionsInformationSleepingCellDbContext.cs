@@ -52,9 +52,14 @@ public partial class ConnectionsInformationSleepingCellDbContext : DbContext
     public virtual DbSet<VKpiResultToday> VKpiResultTodays { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseNpgsql("Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;Username=rnoc1_dbthem;Password=Automation@123;SSL Mode=Prefer;Trust Server Certificate=true;");
+    }
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=RnocDataCenter;Username=postgres;Password=Computer123456$;SSL Mode=Prefer;Trust Server Certificate=true;");
-
+        
+        
+        /// </summary>      
+    ///=> optionsBuilder.UseNpgsql("Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;Username=rnoc1_dbthem;Password=Automation@123;SSL Mode=Prefer;Trust Server Certificate=true;");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Objtable4gkpireport>(entity =>
@@ -212,6 +217,9 @@ public partial class ConnectionsInformationSleepingCellDbContext : DbContext
             entity.Property(e => e.DnMrbtsSite)
                 .HasMaxLength(200)
                 .HasColumnName("dn_mrbts_site");
+            entity.Property(e => e.ExecutionStatus)
+                .HasMaxLength(20)
+                .HasColumnName("execution_status");
             entity.Property(e => e.LnbtsName)
                 .HasMaxLength(100)
                 .HasColumnName("lnbts_name");

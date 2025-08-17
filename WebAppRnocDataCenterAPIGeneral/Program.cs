@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore.Design;
+﻿using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
 /// using WebAppRnocDataCenterAPIGeneral.WebAPIASPModels.NSN.SleepingCell;  // Import models namespace
@@ -23,9 +23,80 @@ using Microsoft.Win32;
 
 
 var builder = WebApplication.CreateBuilder(args);
-string strConnectionStringsDB = builder.Configuration.GetConnectionString("strInformationProductionConnection")!;
+
+
+// Đọc cấu hình IsLocal từ appsettings.Local.json
+// bool isLocal = builder.Configuration.GetValue<bool>("AppSettings:IsLocal");
+
+// bool isLocal = true;
+bool isLocal = false;
+// true la local host
+// false la server
+
+
+
+// Tự động chọn connection string
+// string connectionString;
+string strInformationProductionConnection;
+if (isLocal)
+{
+    // LOCAL - Database của bạn
+    // connectionString = "Host=localhost;Port=5432;Database=RnocDataCenter;Username=postgres;Password=Computer123456$;SSL Mode=Prefer;Trust Server Certificate=true;";
+    strInformationProductionConnection = "Host=localhost;Port=5432;Database=RnocDataCenter;Username=postgres;Password=Computer123456$;SSL Mode=Prefer;Trust Server Certificate=true;";
+    // Console.WriteLine("✅ Đang chạy: LOCAL MODE");
+}
+else
+{
+    // SERVER - Database production
+    strInformationProductionConnection = "Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;Username=rnoc1_dbthem;Password=Automation@123;SSL Mode=Prefer;Trust Server Certificate=true;";
+    // Console.WriteLine("✅ Đang chạy: SERVER MODE");
+}
+
+// Console.WriteLine($"Connection: {strInformationProductionConnection}");
+// Console.WriteLine("=== END ===");
+
+// Sử dụng connection string đã chọn
+/*
+/// builder.Services.AddDbContext<ConnectionsInformationSleepingCellDbContext>(options =>
+    ///options.UseNpgsql(connectionString));
+*/
+
+// string strConnectionStringsDB = builder.Configuration.GetConnectionString("strInformationProductionConnection")!;
 /// var builder = WebApplication.CreateBuilder(args);
 /// string strConnectionStringsDB = builder.Configuration.GetConnectionString("strInformationProductionConnection");
+
+// var builder = WebApplication.CreateBuilder(args);
+
+// Thêm dòng này để kiểm tra môi trường
+// Console.WriteLine($"Current Environment: {builder.Environment.EnvironmentName}");
+// Console.WriteLine($"Is Development: {builder.Environment.IsDevelopment()}");
+// Console.WriteLine($"Is Production: {builder.Environment.IsProduction()}");
+
+// Kiểm tra connection string đang được sử dụng
+// var connectionString = builder.Configuration.GetConnectionString("strInformationProductionConnection");
+// string strConnectionStringsDB = builder.Configuration.GetConnectionString("strInformationProductionConnection")!;
+
+
+// ĐÚNG - dùng cái mới
+builder.Services.AddDbContext<ConnectionsInformationSleepingCellDbContext>(options =>
+    options.UseNpgsql(strInformationProductionConnection));
+
+// Console.WriteLine($"Connection String: {strConnectionStringsDB}");
+
+// Phần còn lại của code...
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Register Business Services
 builder.Services.AddScoped<InterfaceSleepingCellService, ImplementationSleepingCellService>();
@@ -49,10 +120,10 @@ builder.Services.AddScoped<InterfaceDashboardRepository, ImplementationDashboard
 builder.Services.AddScoped<InterfaceFilePathRepository, ImplementationFilePathRepository>();
 builder.Services.AddScoped<InterfaceSleepingCellArchiveRepository, ImplementationSleepingCellArchiveRepository>();
 
-// Ho?c n?u d�ng builder pattern:
+// Ho?c n?u dùng builder pattern:
 builder.Services.AddScoped<InterfaceFilterTableRepository, ImplementationFilterTableRepository>();
 
-// Ho?c n?u d�ng builder pattern:
+// Ho?c n?u dùng builder pattern:
 builder.Services.AddScoped<InterfaceDetailTableRepository, ImplementationDetailTableRepository>();
 
 
@@ -74,11 +145,13 @@ builder.Services.AddDbContext<ConnectionsInformationSleepingCellDbContext>(optio
 
 
 
-
+/*
 
 
 builder.Services.AddDbContext<ConnectionsInformationSleepingCellDbContext>(options =>
     options.UseNpgsql(strConnectionStringsDB));
+
+*/
 
 
 builder.Services.AddControllers();
@@ -122,3 +195,6 @@ app.MapControllers();
 
 /// app.Run();
 await app.RunAsync();
+
+
+

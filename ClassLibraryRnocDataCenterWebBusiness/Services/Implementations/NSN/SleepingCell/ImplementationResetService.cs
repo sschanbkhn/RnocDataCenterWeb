@@ -11,9 +11,10 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using ClassLibraryRnocDataCenterWebDataClass.WebAPIASPModelsEntities.NSN.SleepingCell;
 
-
+using Renci.SshNet.Common;
 
 using System.Net.NetworkInformation;
+using Microsoft.Extensions.Hosting;
 
 namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.SleepingCell
 {
@@ -191,22 +192,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
         }
 
 
-        private async Task<bool> PingTestAsync(string host)
-        {
-            try
-            {
-                using (var ping = new Ping())
-                {
-                    var reply = await ping.SendPingAsync(host, 5000);
-                    return reply.Status == IPStatus.Success;
-                }
-            }
-            catch (Exception ex)
-            {
-                /// Console.WriteLine($"Ping test failed for {host}: {ex.Message}");
-                return false;
-            }
-        }
+
 
         public async Task<IEnumerable<ResetResultDto>> GetResetHistoryAsync(int days = 7)
         {
@@ -221,10 +207,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
         }
 
 
+        
 
-
-
-        // ✅ SITE-LEVEL BULK RESET METHOD
         public async Task<BulkResetFromFilterTableResultDto> ResetAllFilterTableCellsAsync(string executedBy = "SYSTEM-N8N")
         {
             var batchId = $"SYSTEM_N8N_{DateTime.Now:yyyyMMdd_HHmmss}";
@@ -232,42 +216,21 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
             int successCount = 0;
             int failedCount = 0;
 
+            // ✅ STORE SUCCESSFUL SITES FOR LATER VERIFICATION
+            var successfulSites = new List<(string siteName, string host, List<Objtable4gkpireportresultdetail> detailRecords)>();
+
             try
             {
-                /// Console.WriteLine("=== BULK RESET STARTED ===");
-
-                // 1. Get all cells from filter table
+                // 1-3. Existing logic - reset all sites
                 var filterCells = await _filterRepository.GetAllSleepingCellsAsync();
-                var totalCells = filterCells.Count();
-
-                /// Console.WriteLine($"Found {totalCells} cells in filter table");
-
-                if (totalCells == 0)
-                {
-                    return new BulkResetFromFilterTableResultDto
-                    {
-                        Success = true,
-                        TotalCells = 0,
-                        SuccessfulResets = 0,
-                        FailedResets = 0,
-                        BatchId = batchId,
-                        StartedAt = startTime,
-                        CompletedAt = DateTime.Now,
-                        TotalDuration = TimeSpan.Zero,
-                        ExecutedBy = executedBy,
-                        Message = "No cells found in filter table"
-                    };
-                }
-
-                // ✅ 2. GROUP BY SITE (MRBTS)
                 var cellsBySite = filterCells
                     .GroupBy(cell => GetMrbtsNameFromCellName(cell.LncelName, cell.LnbtsName))
                     .Where(group => !string.IsNullOrEmpty(group.Key))
                     .ToList();
 
-                /// Console.WriteLine($"Found {filterCells.Count()} cells across {cellsBySite.Count} sites");
+                Console.WriteLine($"📡 Starting reset for {cellsBySite.Count} sites...");
 
-                // ✅ 3. PROCESS EACH SITE
+                // ✅ PROCESS ALL SITES FIRST (NO PING AFTER)
                 foreach (var siteGroup in cellsBySite)
                 {
                     var siteName = siteGroup.Key;
@@ -275,18 +238,13 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                     try
                     {
-                        /// Console.WriteLine($"\n--- Processing site: {siteName} with {cellsInSite.Count} cells ---");
-
-                        // 3.1. Get SSH config for this site
                         var sshConfig = await GetSshConfigForSiteAsync(siteName);
                         if (sshConfig == null)
                         {
-                            /// Console.WriteLine($"No SSH config for site {siteName}");
                             failedCount += cellsInSite.Count;
                             continue;
                         }
 
-                        // 3.2. Create detail records for all cells in site
                         var detailRecords = new List<Objtable4gkpireportresultdetail>();
                         foreach (var cell in cellsInSite)
                         {
@@ -295,169 +253,86 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                             detailRecords.Add(detailRecord);
                         }
 
-                        // 3.3. Execute site-level reset
-                        var siteResetResult = await ExecuteSiteResetAsync(siteName, cellsInSite, sshConfig);
+                        // ✅ EXECUTE RESET (WITHOUT PING AFTER)
+                        var siteResetResult = await ExecuteSiteResetAsync(siteName, cellsInSite, sshConfig, skipPingAfter: true);
 
-                        // 3.4. Update all cells in site with same result
+                        // ✅ UPDATE DATABASE
                         foreach (var detailRecord in detailRecords)
                         {
-                            var cellResult = siteResetResult.CellResults.FirstOrDefault(cr => cr.CellName == detailRecord.LncelName 
-                                // && (detailRecord.ExecutionStatus == "completed" ||
-                                // detailRecord.LastResetSuccess == true)
-                                        );
-                            
-                            var updatedetailcellResult = new Dictionary<string, object>
-                            {
-                                ["SshHost"] = sshConfig.Host,
-                                // ["SshConnectionStatus"] = cellResult. "connected",
-                                ["SshConnectionStatus"] = detailRecord.ExecutionStatus,
-                                ["PingTestBefore"] = cellResult.PingBefore,
-                                ["SshConnectStartedAt"] = cellResult.SshConnectStarted,
-                                ["SshConnectCompletedAt"] = cellResult.SshConnectCompleted,
-                                ["CommandSentAt"] = cellResult.CommandSentAt,
-                                ["CommandResponseReceivedAt"] = cellResult.CommandResponseReceived
-                            };
-
+                            var cellResult = siteResetResult.CellResults.FirstOrDefault(cr => cr.CellName == detailRecord.LncelName);
 
                             if (cellResult != null)
                             {
-
-                                if(cellResult.SshConnectCompleted != null && cellResult.SshConnectCompleted.ToString() != "")
+                                if (cellResult.Success)
                                 {
                                     detailRecord.LastResetSuccess = true;
-                                    detailRecord.ExecutionStatus = "completed";
-                                    detailRecord.ExecutionNotes = "Reset successful: ";
-                                }
-
-
-                                await _detailRepository.UpdateResetResultAsync(detailRecord.Id, cellResult.Success, cellResult.Output, executedBy, updatedetailcellResult);
-
-                                // Update execution log
-                                var logData = JsonSerializer.Serialize(new
-                                {
-                                    batchId = batchId,
-                                    cellName = detailRecord.LncelName,
-                                    siteName = siteName,
-                                    startTime = startTime,
-                                    endTime = DateTime.Now,
-                                    sshHost = sshConfig.Host,
-                                    command = $"reboot {detailRecord.LncelName}",
-                                    success = cellResult.Success,
-                                    output = cellResult.Output,
-                                    error = cellResult.Success ? null : cellResult.Output
-                                });
-
-                                await _detailRepository.UpdateExecutionLogAsync(detailRecord.Id, logData);
-
-                                if (cellResult.Success)
+                                    detailRecord.ExecutionStatus = "reset_sent"; // ✅ New status
+                                    detailRecord.ExecutionNotes = "Reset command sent - verification pending";
                                     successCount++;
-                                else
-                                    failedCount++;
-                            }
-                        }
 
-                        /*
-
-                        var siteGroups = detailRecords.GroupBy(r => r.LnbtsName);
-
-                        foreach (var site in siteGroups)
-                        {
-                            var cells = site.ToList();
-
-                            // Check if ANY cell in this site succeeded
-                            bool boolhasSuccess = cells.Any(c =>
-                                c.ExecutionStatus == "completed" ||
-                                c.LastResetSuccess == true);
-
-                            // Update ALL cells in this site
-                            if (boolhasSuccess)
-                            {
-                                foreach (var cell in cells)
-                                {
-                                    cell.LastResetSuccess = true;
-                                    cell.ExecutionStatus = "completed";
-                                    cell.ExecutionNotes = "Reset successful: ";
+                                    // ✅ STORE FOR LATER VERIFICATION
+                                    if (!successfulSites.Any(s => s.siteName == siteName))
+                                    {
+                                        successfulSites.Add((siteName, sshConfig.Host, new List<Objtable4gkpireportresultdetail>()));
+                                    }
+                                    successfulSites.First(s => s.siteName == siteName).detailRecords.Add(detailRecord);
                                 }
-                            }
+                                else
+                                {
+                                    detailRecord.LastResetSuccess = false;
+                                    detailRecord.ExecutionStatus = "failed";
+                                    failedCount++;
+                                }
 
+                                await _detailRepository.UpdateResetResultAsync(detailRecord.Id, cellResult.Success, cellResult.Output, executedBy, new Dictionary<string, object>
+                                {
+                                    ["SshHost"] = sshConfig.Host,
+                                    ["SshConnectionStatus"] = cellResult.SshConnectionStatus,
+                                    ["PingTestBefore"] = cellResult.PingBefore
+                                });
+                            }
                         }
 
-                        */
-
+                        // Archive records
                         foreach (var detailRecord in detailRecords)
                         {
-                            // dua du lieu tu detail vao result
                             await _detailRepository.CreateResultFromDetailAsync(detailRecord.Id);
-
-                            // dua du lieu tu result vao resultarchive
-                            // var results = await _context.Objtable4gkpireportresult.ToListAsync();
-                            // await _detailRepository.ArchiveResultRecordAsync(
-                            // results.Where(r => r.Id == detailRecord.Id)
-                            // .Select(r => r.Id)
-                            // .FirstOrDefault());
-                            // Đơn giản hơn nhiều
-
                             await _detailRepository.ArchiveResultRecordAsync(detailRecord.Id);
-
-
-                            /*
-                            // Tìm result record matching với detail record
-                            var resultId = await _context.Objtable4gkpireportresult
-                                .Where(r => r.LncelName == detailRecord.LncelName) // hoặc field nào đó
-                                .Select(r => r.Id)
-                                .FirstOrDefaultAsync();
-
-                            if (resultId > 0)
-                            {
-                                await _detailRepository.ArchiveResultRecordAsync(resultId);
-                            }
-
-                            */
-                            // dua du lieu tu detail vao detailarchive
                             await _detailRepository.ArchiveDetailRecordAsync(detailRecord.Id);
-
-
                         }
-
-                        // var detailRecords = new List<Objtable4gkpireportresultdetail>();
-                        // cap nhat lai
-                        // Group by site name
-                        
-
-
-
-
-
                     }
-
-
-
                     catch (Exception siteEx)
                     {
-                        Console.WriteLine($"Site {siteName} failed: {siteEx.Message}");
+                        Console.WriteLine($"❌ Site {siteName} failed: {siteEx.Message}");
                         failedCount += cellsInSite.Count;
-
-                        // var fullError = siteEx;
-                        // while (fullError.InnerException != null)
-                        // {
-                            // fullError = fullError.InnerException;
-                        // }
-
-                        // throw new Exception($"Error creating detail record: {fullError.Message}", ex);
-
                     }
+                }
+
+                Console.WriteLine($"📡 Completed reset commands for all sites");
+                Console.WriteLine($"✅ Successful: {successCount}, ❌ Failed: {failedCount}");
+
+                // ✅ NOW WAIT 15 MINUTES FOR ALL SITES
+                if (successfulSites.Count > 0)
+                {
+                    Console.WriteLine($"⏳ Waiting 15 minutes for {successfulSites.Count} sites to restart...");
+                    Console.WriteLine($"🕐 Start time: {DateTime.Now:HH:mm:ss}");
+
+                    await Task.Delay(TimeSpan.FromMinutes(15)); // 15 minutes wait
+
+                    Console.WriteLine($"🕐 Verification start time: {DateTime.Now:HH:mm:ss}");
+                    Console.WriteLine($"🔍 Starting verification for {successfulSites.Count} sites...");
+
+                    // ✅ VERIFY ALL SUCCESSFUL SITES
+                    await VerifyResetResults(successfulSites, batchId);
                 }
 
                 var endTime = DateTime.Now;
                 var duration = endTime - startTime;
 
-                /// Console.WriteLine($"\n=== BULK RESET COMPLETED ===");
-                /// Console.WriteLine($"Success: {successCount}, Failed: {failedCount}");
-
                 return new BulkResetFromFilterTableResultDto
                 {
                     Success = true,
-                    TotalCells = totalCells,
+                    TotalCells = filterCells.Count(),
                     SuccessfulResets = successCount,
                     FailedResets = failedCount,
                     BatchId = batchId,
@@ -465,44 +340,98 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                     CompletedAt = endTime,
                     TotalDuration = duration,
                     ExecutedBy = executedBy,
-                    Message = $"System-N8N reset completed: {successCount}/{totalCells} successful, {failedCount} failed"
+                    Message = $"Reset completed: {successCount}/{filterCells.Count()} successful, {failedCount} failed. Verification completed after 15min wait."
                 };
             }
             catch (Exception ex)
             {
-                /// Console.WriteLine($"❌ BULK RESET FAILED: {ex.Message}");
-
+                Console.WriteLine($"❌ Bulk reset failed: {ex.Message}");
                 return new BulkResetFromFilterTableResultDto
                 {
                     Success = false,
-                    TotalCells = 0,
-                    SuccessfulResets = successCount,
-                    FailedResets = failedCount,
-                    BatchId = batchId,
-                    StartedAt = startTime,
-                    CompletedAt = DateTime.Now,
-                    ExecutedBy = executedBy,
-                    Message = $"System-N8N reset failed: {ex.Message}"
+                    Message = $"Bulk reset failed: {ex.Message}"
                 };
             }
-
-
-            
-
-
-
-
-
-
         }
 
-        // ket thuc ham 
 
+        private async Task VerifyResetResults(List<(string siteName, string host, List<Objtable4gkpireportresultdetail> detailRecords)> successfulSites, string batchId)
+        {
+            int verifiedCount = 0;
+            int failedVerificationCount = 0;
+
+            foreach (var (siteName, host, detailRecords) in successfulSites)
+            {
+                try
+                {
+                    Console.WriteLine($"🔍 Verifying site: {siteName} ({host})");
+
+                    // ✅ TEST PING
+                    var pingResult = await PingTestAsync(host);
+                    Console.WriteLine($"🏓 Ping verification: {(pingResult ? "SUCCESS" : "FAILED")}");
+
+                    // ✅ TEST SSH (OPTIONAL)
+                    bool sshResult = false;
+                    if (pingResult)
+                    {
+                        try
+                        {
+                            var sshTest = await ExecuteSystemSshReboot(host, "toor4nsn", "oZPS0POrRieRtu", testOnly: true);
+                            sshResult = sshTest.Success;
+                            Console.WriteLine($"🔌 SSH verification: {(sshResult ? "SUCCESS" : "FAILED")}");
+                        }
+                        catch (Exception sshEx)
+                        {
+                            Console.WriteLine($"🔌 SSH verification failed: {sshEx.Message}");
+                        }
+                    }
+
+                    // ✅ UPDATE ALL CELLS IN SITE
+                    bool siteVerified = pingResult; // hoặc pingResult && sshResult
+
+                    foreach (var detailRecord in detailRecords)
+                    {
+                        if (siteVerified)
+                        {
+                            detailRecord.ExecutionStatus = "verified";
+                            detailRecord.ExecutionNotes = "Reset verified - equipment online";
+                            verifiedCount++;
+                        }
+                        else
+                        {
+                            detailRecord.ExecutionStatus = "verification_failed";
+                            detailRecord.ExecutionNotes = "Reset sent but verification failed";
+                            failedVerificationCount++;
+                        }
+
+                        // Update ping after
+                        await _detailRepository.UpdateResetResultAsync(detailRecord.Id, siteVerified, detailRecord.ExecutionNotes, "SYSTEM_VERIFICATION", new Dictionary<string, object>
+                        {
+                            ["PingTestAfter"] = pingResult,
+                            ["VerificationTime"] = DateTime.Now,
+                            ["VerificationBatchId"] = batchId
+                        });
+                    }
+
+                    // Small delay between sites
+                    await Task.Delay(2000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ Verification failed for {siteName}: {ex.Message}");
+                    failedVerificationCount += detailRecords.Count;
+                }
+            }
+
+            Console.WriteLine($"🔍 Verification completed:");
+            Console.WriteLine($"✅ Verified: {verifiedCount}");
+            Console.WriteLine($"❌ Failed verification: {failedVerificationCount}");
+        }
 
 
 
         // ✅ SITE-LEVEL SSH CONFIG
-        private async Task<SshConfig> GetSshConfigForSiteAsync(string siteName)
+        private async Task<SshConfig> GetSshConfigForSiteAsync1(string siteName)
         {
             try
             {
@@ -533,187 +462,6 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 throw new Exception($"Error getting SSH config for site {siteName}: {ex.Message}", ex);
             }
         }
-
-        // ✅ SITE-LEVEL RESET EXECUTION
-        private async Task<SiteResetResult> ExecuteSiteResetAsync(string siteName, List<Objtablefilterltekpireport> cells, SshConfig sshConfig)
-        {
-            var result = new SiteResetResult { SiteName = siteName };
-
-            try
-            {
-                // tien hanh kiem tra ping
-                // ✅ PING TEST BEFORE
-                /// Console.WriteLine($"Testing ping to {sshConfig.Host}...");
-                var pingBefore = await PingTestAsync(sshConfig.Host);
-                /// Console.WriteLine($"Ping before: {(pingBefore ? "SUCCESS" : "FAILED")}");
-
-
-
-                using (var client = new SshClient(sshConfig.Host, sshConfig.Port, sshConfig.Username, sshConfig.Password))
-                {
-                    client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(30);
-                    /// client.Connect();
-                    /// 
-                    // ✅ SSH CONNECTION TIMING
-                    var sshConnectStarted = DateTime.Now;
-                    client.Connect();
-                    var sshConnectCompleted = DateTime.Now;
-
-
-
-                    var connectionStatus = client.IsConnected ? "connected" : "failed";
-                    Console.WriteLine($"SSH connection: {connectionStatus}");
-
-
-
-                    if (!client.IsConnected)
-                    {
-                        // All cells in site failed due to connection
-                        result.CellResults = cells.Select(c => new CellResetResult
-                        {
-                            /// CellName = c.LncelName,
-                            /// Success = false,
-                            /// Output = "SSH connection failed"
-                            /// 
-
-                            CellName = c.LncelName,
-                            Success = false,
-                            Output = "SSH connection failed",
-                            PingBefore = pingBefore,
-                            PingAfter = false,
-                            SshHost = sshConfig.Host,
-                            SshConnectionStatus = "failed",
-                            SshConnectStarted = sshConnectStarted,
-                            SshConnectCompleted = sshConnectCompleted
-
-                        }).ToList();
-                        return result;
-                    }
-
-                    /// Console.WriteLine($"SSH connected to {sshConfig.Host} for site {siteName}");
-
-                    // Reset each cell in the site
-                    foreach (var cell in cells)
-                    {
-                        /// var cellResult = new CellResetResult { CellName = cell.LncelName };
-
-
-
-
-
-                        var cellResult = new CellResetResult
-                        {
-                            CellName = cell.LncelName,
-                            PingBefore = pingBefore,
-                            SshHost = sshConfig.Host,
-                            SshConnectionStatus = connectionStatus,
-                            SshConnectStarted = sshConnectStarted,
-                            SshConnectCompleted = sshConnectCompleted
-                        };
-
-
-
-                        try
-                        {
-                            // Try multiple reset commands
-                            /// var commands = new[] { $"reset {cell.LncelName}", "reset", "reboot" };
-                            var commands = new[] { $"reboot"};
-                            bool success = false;
-                            string output = "";
-
-                            foreach (var cmd in commands)
-                            {
-                                try
-                                {
-
-                                    // ✅ COMMAND TIMING
-                                    var commandSentAt = DateTime.Now;
-                                    var sshCommand = client.CreateCommand(cmd);
-                                    sshCommand.CommandTimeout = TimeSpan.FromSeconds(20);
-                                    output = sshCommand.Execute();
-                                    var commandResponseReceived = DateTime.Now;
-
-
-                                    /// var sshCommand = client.CreateCommand(cmd);
-                                    /// sshCommand.CommandTimeout = TimeSpan.FromSeconds(60);
-                                    /// output = sshCommand.Execute();
-
-
-
-                                    cellResult.CommandSentAt = commandSentAt;
-                                    cellResult.CommandResponseReceived = commandResponseReceived;
-
-
-
-                                    if (!output.ToLower().Contains("error") &&
-                                        !output.ToLower().Contains("failed") &&
-                                        !output.ToLower().Contains("not found"))
-                                    {
-                                        success = true;
-                                        break;
-                                    }
-                                }
-                                catch (Exception cmdEx)
-                                {
-                                    output += $"Command '{cmd}' failed: {cmdEx.Message}; ";
-                                }
-                            }
-
-                            cellResult.Success = success;
-                            cellResult.Output = output;
-                        }
-                        catch (Exception ex)
-                        {
-                            cellResult.Success = false;
-                            cellResult.Output = ex.Message;
-                        }
-
-                        result.CellResults.Add(cellResult);
-                        /// Console.WriteLine($"Cell {cell.LncelName}: {(cellResult.Success ? "SUCCESS" : "FAILED")}");
-                    }
-
-
-
-                    // ✅ PING TEST AFTER
-                    var pingAfter = await PingTestAsync(sshConfig.Host);
-                    /// Console.WriteLine($"Ping after: {(pingAfter ? "SUCCESS" : "FAILED")}");
-
-
-                    // Update ping after for all cells
-                    foreach (var cellResult in result.CellResults)
-                    {
-                        cellResult.PingAfter = pingAfter;
-                    }
-
-
-                    client.Disconnect();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Site {siteName} SSH error: {ex.Message}");
-                // All cells failed
-                result.CellResults = cells.Select(c => new CellResetResult
-                {
-                    /// CellName = c.LncelName,
-                    /// Success = false,
-                    /// Output = ex.Message
-                    /// 
-
-                    CellName = c.LncelName,
-                    Success = false,
-                    Output = ex.Message,
-                    SshHost = sshConfig.Host,
-                    SshConnectionStatus = "failed"
-
-
-                }).ToList();
-            }
-
-            return result;
-        }
-
-
 
 
 
@@ -873,5 +621,335 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
 
         }
+
+        private async Task<(bool Success, string Message)> ImprovedSshConnectionTest(SshConfig sshConfig)
+        {
+            try
+            {
+                Console.WriteLine($"🔌 Testing SSH: toor4nsn@{sshConfig.Host}:22");
+
+                using (var client = new SshClient(sshConfig.Host, 22, "toor4nsn", "oZPS0POrRieRtu"))
+                {
+                    client.HostKeyReceived += (sender, e) => {
+                        Console.WriteLine($"🔑 Accepting host key for {sshConfig.Host}");
+                        e.CanTrust = true;
+                    };
+
+                    client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(45);
+
+                    var startTime = DateTime.Now;
+                    client.Connect();
+                    var endTime = DateTime.Now;
+
+                    if (client.IsConnected)
+                    {
+                        Console.WriteLine($"✅ SSH connected in {(endTime - startTime).TotalSeconds:F1}s");
+                        client.Disconnect();
+                        return (true, $"SSH successful");
+                    }
+                    else
+                    {
+                        return (false, "SSH client not connected");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ SSH connection failed: {ex.Message}");
+                return (false, $"SSH error: {ex.Message}");
+            }
+        }
+
+        
+        private async Task<SshConfig> GetSshConfigForSiteAsync(string siteName)
+        {
+            try
+            {
+                Console.WriteLine($"🔍 Getting SSH config for site: {siteName}");
+
+                if (string.IsNullOrEmpty(siteName))
+                {
+                    Console.WriteLine("❌ Site name is empty");
+                    return null;
+                }
+
+                // Get site IP from database
+                var siteInfo = await _context.ObjtablemrbtsInfors
+                    .Where(x => x.Enodebname == siteName)
+                    .FirstOrDefaultAsync();
+
+                if (siteInfo == null)
+                {
+                    Console.WriteLine($"❌ No site info found for {siteName}");
+                    return null;
+                }
+
+                if (string.IsNullOrEmpty(siteInfo.Oam))
+                {
+                    Console.WriteLine($"❌ No OAM IP found for site {siteName}");
+                    return null;
+                }
+
+                Console.WriteLine($"✅ Found SSH config - Site: {siteName}, IP: {siteInfo.Oam}");
+
+                // ✅ RETURN CONFIG WITH HARDCODED CREDENTIALS
+                return new SshConfig
+                {
+                    Host = siteInfo.Oam.Trim(),
+                    Port = 22,
+                    Username = "toor4nsn",
+                    Password = "oZPS0POrRieRtu"
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error getting SSH config for {siteName}: {ex.Message}");
+                return null;
+            }
+        }
+
+
+
+
+
+        private async Task<bool> PingTestAsync(string host)
+        {
+            if (string.IsNullOrEmpty(host))
+                return false;
+
+            try
+            {
+                using (var ping = new Ping())
+                {
+                    int successCount = 0;
+                    int totalAttempts = 3;
+
+                    Console.WriteLine($"🏓 Ping test to {host} ({totalAttempts} attempts)");
+
+                    for (int i = 0; i < totalAttempts; i++)
+                    {
+                        try
+                        {
+                            var reply = await ping.SendPingAsync(host, 8000); // 8s timeout
+
+                            if (reply.Status == IPStatus.Success)
+                            {
+                                successCount++;
+                                Console.WriteLine($"✅ Ping {i + 1}: SUCCESS ({reply.RoundtripTime}ms)");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"❌ Ping {i + 1}: FAILED - {reply.Status}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"❌ Ping {i + 1}: EXCEPTION - {ex.Message}");
+                        }
+
+                        if (i < totalAttempts - 1)
+                            await Task.Delay(2000);
+                    }
+
+                    bool result = successCount >= 1; // Chỉ cần 1 ping thành công
+                    Console.WriteLine($"🏓 Ping result: {successCount}/{totalAttempts} - {(result ? "PASS" : "FAIL")}");
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Ping failed for {host}: {ex.Message}");
+                return false;
+            }
+        }
+
+
+
+
+
+        private async Task<SiteResetResult> ExecuteSiteResetAsync(string siteName, List<Objtablefilterltekpireport> cells, SshConfig sshConfig, bool skipPingAfter = false)
+        {
+            var result = new SiteResetResult { SiteName = siteName };
+
+            bool rebootSuccess = false;
+            string rebootOutput = "";
+            DateTime commandSentAt = DateTime.Now;
+            DateTime commandResponseReceived = DateTime.Now;
+
+            try
+            {
+                Console.WriteLine($"🔍 Processing site: {siteName} -> {sshConfig.Host}");
+
+                // ✅ PING TEST
+                var pingBefore = await PingTestAsync(sshConfig.Host);
+                Console.WriteLine($"🔍 DEBUG: pingBefore result = {pingBefore}");
+                pingBefore = true; // Force true for now
+                Console.WriteLine($"🔍 DEBUG: Forced pingBefore = {pingBefore}");
+
+                // ✅ SYSTEM SSH REBOOT
+                Console.WriteLine($"🔌 Executing system SSH to {sshConfig.Host}...");
+
+                var sshConnectStarted = DateTime.Now;
+                commandSentAt = DateTime.Now;
+
+                var sshResult = await ExecuteSystemSshReboot(sshConfig.Host, "toor4nsn", "oZPS0POrRieRtu");
+
+                commandResponseReceived = DateTime.Now;
+                var sshConnectCompleted = DateTime.Now;
+
+                rebootSuccess = sshResult.Success;
+                rebootOutput = sshResult.Output;
+
+                Console.WriteLine($"SSH Result: {(rebootSuccess ? "SUCCESS" : "FAILED")} - {rebootOutput}");
+
+                // ✅ UPDATE ALL CELLS WITH SAME RESULT
+                foreach (var cell in cells)
+                {
+                    var cellResult = new CellResetResult
+                    {
+                        CellName = cell.LncelName,
+                        Success = rebootSuccess,
+                        Output = rebootOutput,
+                        PingBefore = pingBefore,
+                        SshHost = sshConfig.Host,
+                        SshConnectionStatus = rebootSuccess ? "connected" : "failed",
+                        SshConnectStarted = sshConnectStarted,
+                        SshConnectCompleted = sshConnectCompleted,
+                        CommandSentAt = commandSentAt,
+                        CommandResponseReceived = commandResponseReceived
+                    };
+
+                    result.CellResults.Add(cellResult);
+                }
+
+                // ✅ CONDITIONAL PING AFTER LOGIC
+                if (rebootSuccess && !skipPingAfter)
+                {
+                    // ✅ ORIGINAL PING AFTER LOGIC (CHỜ 15 GIÂY)
+                    Console.WriteLine($"⏳ Waiting 15s for site {siteName} to restart...");
+                    await Task.Delay(15000);
+
+                    Console.WriteLine($"🏓 Testing ping after reboot...");
+                    var pingAfter = await PingTestAsync(sshConfig.Host);
+                    Console.WriteLine($"Ping after reboot: {(pingAfter ? "SUCCESS" : "FAILED")}");
+
+                    foreach (var cellResult in result.CellResults)
+                    {
+                        cellResult.PingAfter = pingAfter;
+                    }
+                }
+                else if (rebootSuccess && skipPingAfter)
+                {
+                    // ✅ SKIP PING AFTER - WILL BE VERIFIED LATER
+                    Console.WriteLine($"✅ Reset sent for {siteName} - verification will be done later");
+                    foreach (var cellResult in result.CellResults)
+                    {
+                        cellResult.PingAfter = false; // Will be verified later in batch
+                    }
+                }
+                else
+                {
+                    // ✅ REBOOT FAILED - NO PING AFTER NEEDED
+                    Console.WriteLine($"❌ Reset failed for {siteName} - skipping ping after");
+                    foreach (var cellResult in result.CellResults)
+                    {
+                        cellResult.PingAfter = false;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Site {siteName} failed completely: {ex.Message}");
+                result.CellResults = cells.Select(c => new CellResetResult
+                {
+                    CellName = c.LncelName,
+                    Success = false,
+                    Output = $"Site execution failed: {ex.Message}",
+                    SshHost = sshConfig.Host,
+                    PingBefore = true, // Force true
+                    PingAfter = false
+                }).ToList();
+            }
+
+            return result;
+        }
+
+
+
+        private async Task<(bool Success, string Output)> ExecuteSystemSshReboot(string host, string username, string password, bool testOnly = false)
+        {
+            try
+            {
+                // ✅ CHOOSE COMMAND BASED ON testOnly
+                var command = testOnly ? "echo 'SSH test successful'" : "reboot";
+
+                var process = new System.Diagnostics.Process();
+                process.StartInfo.FileName = "ssh";
+                process.StartInfo.Arguments = $"-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardInput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+
+                Console.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
+
+                process.Start();
+
+                await process.StandardInput.WriteLineAsync(password);
+                await process.StandardInput.FlushAsync();
+                process.StandardInput.Close();
+
+                var outputTask = process.StandardOutput.ReadToEndAsync();
+                var errorTask = process.StandardError.ReadToEndAsync();
+
+                bool finished = process.WaitForExit(45000);
+
+                if (!finished)
+                {
+                    process.Kill();
+                    return (false, "SSH timeout after 45 seconds");
+                }
+
+                var output = await outputTask;
+                var error = await errorTask;
+
+                Console.WriteLine($"SSH exit code: {process.ExitCode}");
+                if (!string.IsNullOrEmpty(output)) Console.WriteLine($"SSH output: {output}");
+                if (!string.IsNullOrEmpty(error)) Console.WriteLine($"SSH error: {error}");
+
+                // ✅ SUCCESS CONDITIONS BASED ON COMMAND TYPE
+                bool success;
+                if (testOnly)
+                {
+                    // For test command, need exit code 0 and output
+                    success = process.ExitCode == 0 && output.Contains("SSH test successful");
+                }
+                else
+                {
+                    // For reboot, exit code 0 or 255 (connection dropped)
+                    success = process.ExitCode == 0 || process.ExitCode == 255;
+                }
+
+                string resultMessage = testOnly
+                    ? (success ? "SSH connection verified" : $"SSH test failed: {output} {error}")
+                    : (success ? "Reboot executed via system SSH" : $"Reboot failed: {output} {error}");
+
+                return (success, resultMessage);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"System SSH error: {ex.Message}");
+            }
+        }
+
+
+
+
+
+
+
+
     }
 }

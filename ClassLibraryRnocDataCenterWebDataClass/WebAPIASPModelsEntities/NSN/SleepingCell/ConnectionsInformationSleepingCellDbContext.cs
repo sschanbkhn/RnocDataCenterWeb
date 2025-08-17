@@ -53,7 +53,7 @@ public partial class ConnectionsInformationSleepingCellDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;Username=rnoc1_dbthem;Password=Automation@123;SSL Mode=Prefer;Trust Server Certificate=true;");
+        // optionsBuilder.UseNpgsql("Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;Username=rnoc1_dbthem;Password=Automation@123;SSL Mode=Prefer;Trust Server Certificate=true;");
     }
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         
@@ -1041,6 +1041,7 @@ public partial class ConnectionsInformationSleepingCellDbContext : DbContext
 
         OnModelCreatingPartial(modelBuilder);
     }
+
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

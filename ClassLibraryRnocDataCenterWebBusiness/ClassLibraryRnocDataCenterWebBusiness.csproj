@@ -9,6 +9,8 @@
   <ItemGroup>
     <Compile Remove="Services\Implementations\NSN\SleepingCell\ImplementationResetService_1.cs" />
     <Compile Remove="Services\Implementations\NSN\SleepingCell\ImplementationResetService_2.cs" />
+    <Compile Remove="Services\Implementations\NSN\SleepingCell\ImplementationResetService_3.cs" />
+    <Compile Remove="Services\Implementations\NSN\SleepingCell\ImplementationResetService_4.cs" />
   </ItemGroup>
 
   <ItemGroup>

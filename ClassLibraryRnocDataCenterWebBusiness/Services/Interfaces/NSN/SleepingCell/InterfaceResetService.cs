@@ -32,8 +32,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Interfaces.NSN.Sleeping
         Task<bool> CanResetMoreCellsAsync(int requestedCount = 1);
 
         // Thêm method này vào interface existing:
-        Task<BulkResetFromFilterTableResultDto> ResetAllFilterTableCellsAsync(string executedBy = "N8N");
-
+        // Task<BulkResetFromFilterTableResultDto> funImplementationServicesResetAllFilterTableCellsAsync(string executedBy = "N8N");
+        Task<BulkResetFromFilterTableResultDto> funImplementationServicesResetAllFilterTableCellsAsync(string executedBy = "SYSTEM-N8N");
 
     }
 }

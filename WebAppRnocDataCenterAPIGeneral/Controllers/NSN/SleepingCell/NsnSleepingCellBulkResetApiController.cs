@@ -18,12 +18,13 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
         /// Bulk reset all sleeping cells from filter table
         /// N8N calls this single API to reset all cells
         /// </summary>
-        [HttpPost("bulk-reset")]
+        [HttpPost("Sleeping Cell-reset")]
         public async Task<IActionResult> BulkResetAllCells()
         {
             try
             {
-                var result = await _resetService.ResetAllFilterTableCellsAsync("SYSTEM_N8N_RESET");
+                // var result = await _resetService.funImplementationServicesResetAllFilterTableCellsAsync("SYSTEM_N8N_RESET");
+                var result = await _resetService.funImplementationServicesResetAllFilterTableCellsAsync("SYSTEM_N8N_RESET");
 
                 if (result.Success)
                 {

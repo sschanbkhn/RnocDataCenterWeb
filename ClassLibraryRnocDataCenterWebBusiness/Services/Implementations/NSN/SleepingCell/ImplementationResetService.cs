@@ -234,6 +234,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                     .ToList();
 
                 Debug.WriteLine($"📡 Starting reset for {cellsBySite.Count} sites...");
+                Console.WriteLine($"📡 Starting reset for {cellsBySite.Count} sites...");
+                
 
                 // ✅ PROCESS ALL SITES FIRST (NO PING AFTER)
                 foreach (var siteGroup in cellsBySite)
@@ -260,7 +262,10 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                         // ✅ EXECUTE RESET (WITHOUT PING AFTER)
                         var siteResetResult = await funImplementationServiceExecuteSiteResetAsync(siteName, cellsInSite, sshConfig, skipPingAfter: true);
-                        
+
+                        Debug.WriteLine($"📡 funImplementationServiceExecuteSiteResetAsync(siteName, cellsInSite, sshConfig, skipPingAfter: true)");
+                        Console.WriteLine($"📡 funImplementationServiceExecuteSiteResetAsync(siteName, cellsInSite, sshConfig, skipPingAfter: true)");
+
                         // ✅ UPDATE DATABASE
                         foreach (var detailRecord in detailRecords)
                         {
@@ -311,6 +316,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                             }
                         }
                         Debug.WriteLine($"📋 Starting archive for {detailRecords.Count} records...");
+                        Console.WriteLine($"📋 Starting archive for {detailRecords.Count} records...");
 
                         // Archive records
                         foreach (var detailRecord in detailRecords)
@@ -319,10 +325,15 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                             await _detailRepository.ArchiveResultRecordAsync(detailRecord.Id);
                             await _detailRepository.ArchiveDetailRecordAsync(detailRecord.Id);
                         }
+
+                        Debug.WriteLine($"📋 await _detailRepository.CreateResultFromDetailAsync(detailRecord.Id);");
+                        Console.WriteLine($"📋 await _detailRepository.CreateResultFromDetailAsync(detailRecord.Id);");
+
                     }
                     catch (Exception siteEx)
                     {
                         Debug.WriteLine($"❌ Site {siteName} failed: {siteEx.Message}");
+                        Console.WriteLine($"❌ Site {siteName} failed: {siteEx.Message}");
                         failedCount += cellsInSite.Count;
                     }
                 }
@@ -330,16 +341,23 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 Debug.WriteLine($"📡 Completed reset commands for all sites");
                 Debug.WriteLine($"✅ Successful: {successCount}, ❌ Failed: {failedCount}");
 
+                Console.WriteLine($"📡 Completed reset commands for all sites");
+                Console.WriteLine($"✅ Successful: {successCount}, ❌ Failed: {failedCount}");
+
                 // ✅ NOW WAIT 15 MINUTES FOR ALL SITES
                 if (successfulSites.Count > 0)
                 {
                     Debug.WriteLine($"⏳ Waiting 15 minutes for {successfulSites.Count} sites to restart...");
                     Debug.WriteLine($"🕐 Start time: {DateTime.Now:HH:mm:ss}");
 
+
+                    Console.WriteLine($"⏳ Waiting 15 minutes for {successfulSites.Count} sites to restart...");
+                    Console.WriteLine($"🕐 Start time: {DateTime.Now:HH:mm:ss}");
+
                     // await Task.Delay(TimeSpan.FromMinutes(15)); // 15 minutes wait
 
-                    Debug.WriteLine($"🕐 Verification start time: {DateTime.Now:HH:mm:ss}");
-                    Debug.WriteLine($"🔍 Starting verification for {successfulSites.Count} sites...");
+                    Console.WriteLine($"🕐 Verification start time: {DateTime.Now:HH:mm:ss}");
+                    Console.WriteLine($"🔍 Starting verification for {successfulSites.Count} sites...");
 
                     // ✅ VERIFY ALL SUCCESSFUL SITES
                     // await VerifyResetResults(successfulSites, batchId);
@@ -367,6 +385,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
             catch (Exception ex)
             {
                 Debug.WriteLine($"❌ System_N8N_ reset failed: {ex.Message}");
+                Console.WriteLine($"❌ System_N8N_ reset failed: {ex.Message}");
                 return new BulkResetFromFilterTableResultDto
                 {
                     Success = false,
@@ -735,6 +754,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
         private async Task<bool> PingTestAsync(string host)
         {
+            // ham ping cho server
+            // server dung linux len khac so voi window
             if (string.IsNullOrEmpty(host))
                 return false;
 
@@ -746,6 +767,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                     int totalAttempts = 3;
 
                     Debug.WriteLine($"🏓 Ping test to {host} ({totalAttempts} attempts)");
+                    Console.WriteLine($"🏓 Ping test to {host} ({totalAttempts} attempts)");
 
                     for (int i = 0; i < totalAttempts; i++)
                     {
@@ -757,15 +779,18 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                             {
                                 successCount++;
                                 Debug.WriteLine($"✅ Ping {i + 1}: SUCCESS ({reply.RoundtripTime}ms)");
+                                Console.WriteLine($"✅ Ping {i + 1}: SUCCESS ({reply.RoundtripTime}ms)");
                             }
                             else
                             {
                                 Debug.WriteLine($"❌ Ping {i + 1}: FAILED - {reply.Status}");
+                                Console.WriteLine($"❌ Ping {i + 1}: FAILED - {reply.Status}");
                             }
                         }
                         catch (Exception ex)
                         {
                             Debug.WriteLine($"❌ Ping {i + 1}: EXCEPTION - {ex.Message}");
+                            Console.WriteLine($"❌ Ping {i + 1}: EXCEPTION - {ex.Message}");
                         }
 
                         if (i < totalAttempts - 1)
@@ -774,6 +799,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                     bool result = successCount >= 1; // Chỉ cần 1 ping thành công
                     Debug.WriteLine($"🏓 Ping result: {successCount}/{totalAttempts} - {(result ? "PASS" : "FAIL")}");
+                    Console.WriteLine($"🏓 Ping result: {successCount}/{totalAttempts} - {(result ? "PASS" : "FAIL")}");
                     return result;
                 }
             }
@@ -803,9 +829,18 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                 // ✅ PING TEST
                 // var pingBefore = await PingTestAsync(sshConfig.Host);
-                var pingBefore = await funImplementationServicePingTestAsyncLocalDEV(sshConfig.Host);
+                // var pingBefore = await funImplementationServicePingTestAsyncLocalDEV(sshConfig.Host);
 
-                Debug.WriteLine($"🔍 DEBUG: pingBefore result = {pingBefore}");
+                    var pingBefore = await funImplementationServicePingTestAsyncLocalDEV(sshConfig.Host);
+
+
+
+
+
+
+
+                    Debug.WriteLine($"🔍 DEBUG: pingBefore result = {pingBefore}");
+                Console.WriteLine($"🔍 DEBUG: pingBefore result = {pingBefore}");
                 // pingBefore = true; // Force true for now
                 // Debug.WriteLine($"🔍 DEBUG: Forced pingBefore = {pingBefore}");
 

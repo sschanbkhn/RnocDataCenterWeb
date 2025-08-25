@@ -405,9 +405,9 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 try
                 {
                     Debug.WriteLine($"🔍 Verifying site: {siteName} ({host})");
-
+                    
                     // ✅ TEST PING
-                    var pingResult = await PingTestAsync(host);
+                    var pingResult = await funImplementationServicePingTestAsyncServerAPIDEV(host);
                     Debug.WriteLine($"🏓 Ping verification: {(pingResult ? "SUCCESS" : "FAILED")}");
 
                     // ✅ TEST SSH (OPTIONAL)
@@ -416,7 +416,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                     {
                         try
                         {
-                            var sshTest = await ExecuteSystemSshReboot(host, "toor4nsn", "oZPS0POrRieRtu", testOnly: true);
+                            var sshTest = await funImplementationServiceExecuteSystemSshRebootServerAPIDEV(host, "toor4nsn", "oZPS0POrRieRtu", testOnly: true);
                             sshResult = sshTest.Success;
                             Debug.WriteLine($"🔌 SSH verification: {(sshResult ? "SUCCESS" : "FAILED")}");
                         }
@@ -894,44 +894,6 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                     result.CellResults.Add(cellResult);
                 }
 
-                // ✅ CONDITIONAL PING AFTER LOGIC
-                /*
-                if (rebootSuccess && !skipPingAfter)
-                {
-                    // ✅ ORIGINAL PING AFTER LOGIC (CHỜ 15 GIÂY)
-                    Console.WriteLine($"⏳ Waiting 15s for site {siteName} to restart...");
-                    await Task.Delay(15000);
-
-                    Console.WriteLine($"🏓 Testing ping after reboot...");
-                    var pingAfter = await PingTestAsync(sshConfig.Host);
-                    Console.WriteLine($"Ping after reboot: {(pingAfter ? "SUCCESS" : "FAILED")}");
-
-                    foreach (var cellResult in result.CellResults)
-                    {
-                        cellResult.PingAfter = pingAfter;
-                    }
-                }
-                else if (rebootSuccess && skipPingAfter)
-                {
-                    // ✅ SKIP PING AFTER - WILL BE VERIFIED LATER
-                    Console.WriteLine($"✅ Reset sent for {siteName} - verification will be done later");
-                    foreach (var cellResult in result.CellResults)
-                    {
-                        cellResult.PingAfter = false; // Will be verified later in batch
-                    }
-                }
-                else
-                {
-                    // ✅ REBOOT FAILED - NO PING AFTER NEEDED
-                    Console.WriteLine($"❌ Reset failed for {siteName} - skipping ping after");
-                    foreach (var cellResult in result.CellResults)
-                    {
-                        cellResult.PingAfter = false;
-                    }
-                }
-
-                */
-
 
             }
             catch (Exception ex)
@@ -970,6 +932,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 process.StartInfo.CreateNoWindow = true;
 
                 Debug.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
+                Console.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
 
                 process.Start();
 
@@ -980,18 +943,23 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();
 
-                bool finished = process.WaitForExit(45000);
+                bool finished = process.WaitForExit(15000);
+
+                Debug.WriteLine($"🔌 bool finished = process.WaitForExit(15000);");
+                Console.WriteLine($"🔌 bool finished = process.WaitForExit(15000);");
 
                 if (!finished)
                 {
                     process.Kill();
-                    return (false, "SSH timeout after 45 seconds");
+                    return (false, "SSH timeout after 15 seconds");
                 }
 
                 var output = await outputTask;
                 var error = await errorTask;
 
                 Debug.WriteLine($"SSH exit code: {process.ExitCode}");
+                Console.WriteLine($"SSH exit code: {process.ExitCode}");
+
                 if (!string.IsNullOrEmpty(output)) Debug.WriteLine($"SSH output: {output}");
                 if (!string.IsNullOrEmpty(error)) Debug.WriteLine($"SSH error: {error}");
 
@@ -1075,198 +1043,6 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 return false;
             }
         }
-
-        /*
-
-        private async Task<(bool Success, string Output)> funImplementationServiceSshExecuteAsyncLocalDEV(string host, string username, string password, bool testOnly = false)
-        {
-            // ✅ VALIDATE INPUT
-            if (string.IsNullOrEmpty(host))
-            {
-                Console.WriteLine($"⚠️ SSH skipped - empty host");
-                return (false, "Empty host provided");
-            }
-
-            try
-            {
-                Console.WriteLine($"🔌 SSH to {host} (testOnly: {testOnly}) - Starting...");
-
-                using (var client = new SshClient(host, 22, username, password))
-                {
-                    // ✅ SHORTER TIMEOUTS TO FAIL FAST
-                    // client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(15); // Reduced from 30s
-                    client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(10); // Reduced from 30s
-                    client.ConnectionInfo.RetryAttempts = 1; // Reduced from 2
-
-                    // Accept any host key
-                    client.HostKeyReceived += (sender, e) => {
-                        Console.WriteLine($"🔑 Accepting host key for {host}");
-                        e.CanTrust = true;
-                    };
-
-                    // ✅ CONNECT WITH TIMEOUT
-                    var connectStartTime = DateTime.Now;
-                    // await Task.Run(() => client.Connect());
-
-                    using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10)))
-                    {
-                        
-                        try
-                        {
-                            await Task.Run(() => client.Connect());
-                            var connectEndTime_ = DateTime.Now;
-                            // connectEndTime = DateTime.Now;
-
-                            if (!client.IsConnected)
-                            {
-                                Console.WriteLine($"⚠️ SSH connection failed to {host} - client not connected (continuing anyway)");
-                                return (false, "SSH connection failed - client not connected");
-                            }
-
-                            Console.WriteLine($"✅ SSH connected to {host} in {(connectEndTime_ - connectStartTime).TotalSeconds:F1}s");
-                        }
-                        catch (SshOperationTimeoutException timeoutEx)
-                        {
-                            var connectEndTime1 = DateTime.Now;
-                            // connectEndTime = DateTime.Now;
-                            Console.WriteLine($"⚠️ SSH timeout for {host}: Connection timeout after {(connectEndTime1 - connectStartTime).TotalSeconds:F1}s (continuing anyway)");
-                            return (false, $"SSH timeout: {timeoutEx.Message}");
-                        }
-                        catch (Exception connectEx)
-                        {
-                            var connectEndTime2 = DateTime.Now;
-                            Console.WriteLine($"⚠️ SSH connection error for {host}: {connectEx.GetType().Name} - {connectEx.Message} (continuing anyway)");
-                            return (false, $"SSH connection error: {connectEx.Message}");
-                        }
-
-                    }
-
-                    /*
-                    using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10)))
-                    {
-                        try
-                        {
-                            await Task.Run(() => client.Connect(), cts.Token);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            Console.WriteLine($"⚠️ SSH connection cancelled after 10s timeout for {host} (continuing anyway)");
-                            return (false, "SSH connection timeout - operation cancelled");
-                        }
-                        catch (Exception ex)
-                        {
-                            // ✅ GENERAL ERROR HANDLING - LOG AND CONTINUE
-                            Console.WriteLine($"⚠️ SSH general error for {host}: {ex.GetType().Name} - {ex.Message} (continuing anyway)");
-                            Console.WriteLine($"⚠️ Stack trace: {ex.StackTrace}"); // Thêm dòng này để debug
-                            return (false, $"SSH error: {ex.Message}");
-                        }
-
-
-                    }
-
-                    
-
-                    var connectEndTime = DateTime.Now;
-
-                    if (!client.IsConnected)
-                    {
-                        Console.WriteLine($"⚠️ SSH connection failed to {host} - client not connected (continuing anyway)");
-                        return (false, "SSH connection failed - client not connected");
-                    }
-
-                    Console.WriteLine($"✅ SSH connected to {host} in {(connectEndTime - connectStartTime).TotalSeconds:F1}s");
-
-                    // ✅ EXECUTE COMMAND
-                    var command = testOnly ? "echo 'SSH_TEST_SUCCESS'" : "reboot";
-                    Console.WriteLine($"🔌 Executing command on {host}: {command}");
-
-                    using (var cmd = client.CreateCommand(command))
-                    {
-                        cmd.CommandTimeout = TimeSpan.FromSeconds(30); // Reduced from 45s
-
-                        var commandStartTime = DateTime.Now;
-                        var result = cmd.Execute();
-                        var commandEndTime = DateTime.Now;
-
-                        Console.WriteLine($"SSH command completed on {host} in {(commandEndTime - commandStartTime).TotalSeconds:F1}s");
-                        Console.WriteLine($"SSH command result from {host}: {result}");
-
-                        // ✅ PROPER DISCONNECT
-                        try
-                        {
-                            client.Disconnect();
-                        }
-                        catch (Exception disconnectEx)
-                        {
-                            Console.WriteLine($"⚠️ SSH disconnect warning for {host}: {disconnectEx.Message}");
-                        }
-
-                        // ✅ EVALUATE RESULT
-                        bool success;
-                        string resultMessage;
-
-                        if (testOnly)
-                        {
-                            success = result.Contains("SSH_TEST_SUCCESS");
-                            resultMessage = success
-                                ? "SSH connection verified successfully"
-                                : $"SSH test failed - unexpected output: {result}";
-                        }
-                        else
-                        {
-                            var lowerResult = result.ToLower();
-                            bool hasError = lowerResult.Contains("error") ||
-                                           lowerResult.Contains("permission denied") ||
-                                           lowerResult.Contains("command not found") ||
-                                           lowerResult.Contains("access denied") ||
-                                           lowerResult.Contains("not found");
-
-                            success = !hasError;
-                            resultMessage = success
-                                ? "Reboot command executed successfully via SSH"
-                                : $"Reboot command may have failed: {result}";
-                        }
-
-                        Console.WriteLine($"SSH operation result for {host}: {(success ? "SUCCESS" : "FAILED")} - {resultMessage}");
-                        return (success, resultMessage);
-                    }
-                }
-            }
-            catch (Renci.SshNet.Common.SshOperationTimeoutException timeoutEx)
-            {
-                // ✅ SSH TIMEOUT SPECIFIC HANDLING
-                Console.WriteLine($"⚠️ SSH timeout for {host}: Connection timeout after 10s (host slow/unreachable - continuing anyway)");
-                return (false, $"SSH timeout: {timeoutEx.Message}");
-            }
-
-            catch (System.Net.Sockets.SocketException sockEx)
-            {
-                // ✅ NETWORK-SPECIFIC ERROR HANDLING
-                Console.WriteLine($"⚠️ SSH network error for {host}: {sockEx.Message} (host unreachable - continuing anyway)");
-                return (false, $"Network unreachable: {sockEx.Message}");
-            }
-            catch (Renci.SshNet.Common.SshConnectionException sshEx)
-            {
-                // ✅ SSH-SPECIFIC ERROR HANDLING  
-                Console.WriteLine($"⚠️ SSH connection error for {host}: {sshEx.Message} (SSH service unavailable - continuing anyway)");
-                return (false, $"SSH connection failed: {sshEx.Message}");
-            }
-            catch (TimeoutException timeEx)
-            {
-                // ✅ TIMEOUT-SPECIFIC ERROR HANDLING
-                Console.WriteLine($"⚠️ SSH timeout for {host}: {timeEx.Message} (operation timed out - continuing anyway)");
-                return (false, $"SSH timeout: {timeEx.Message}");
-            }
-            catch (Exception ex)
-            {
-                // ✅ GENERAL ERROR HANDLING - LOG AND CONTINUE
-                Console.WriteLine($"⚠️ SSH general error for {host}: {ex.GetType().Name} - {ex.Message} (continuing anyway)");
-                return (false, $"SSH error: {ex.Message}");
-            }
-        }
-
-
-        */
 
 
         private async Task<(bool Success, string Output)> funImplementationServiceSshExecuteAsyncLocalDEV(string host, string username, string password, bool testOnly = false)
@@ -1422,6 +1198,10 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 }
             }
         }
+
+
+
+
 
 
 

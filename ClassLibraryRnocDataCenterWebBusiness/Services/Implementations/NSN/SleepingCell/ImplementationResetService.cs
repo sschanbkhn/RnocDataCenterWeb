@@ -752,7 +752,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
 
 
-        private async Task<bool> PingTestAsync(string host)
+        private async Task<bool> funImplementationServicePingTestAsyncServerAPIDEV(string host)
         {
             // ham ping cho server
             // server dung linux len khac so voi window
@@ -806,6 +806,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
             catch (Exception ex)
             {
                 Debug.WriteLine($"❌ Ping failed for {host}: {ex.Message}");
+                Console.WriteLine($"❌ Ping failed for {host}: {ex.Message}");
                 return false;
             }
         }
@@ -831,15 +832,18 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 // var pingBefore = await PingTestAsync(sshConfig.Host);
                 // var pingBefore = await funImplementationServicePingTestAsyncLocalDEV(sshConfig.Host);
 
-                    var pingBefore = await funImplementationServicePingTestAsyncLocalDEV(sshConfig.Host);
+                // chay cho local
+                // var pingBefore = await funImplementationServicePingTestAsyncLocalDEV(sshConfig.Host);
+
+                // chay cho server
+                var pingBefore = await funImplementationServicePingTestAsyncServerAPIDEV(sshConfig.Host);
+
+                Debug.WriteLine($"🔍 var pingBefore = await funImplementationServicePingTestAsyncServerAPIDEV(sshConfig.Host);");
+                Console.WriteLine($"🔍 var pingBefore = await funImplementationServicePingTestAsyncServerAPIDEV(sshConfig.Host);");
 
 
 
-
-
-
-
-                    Debug.WriteLine($"🔍 DEBUG: pingBefore result = {pingBefore}");
+                Debug.WriteLine($"🔍 DEBUG: pingBefore result = {pingBefore}");
                 Console.WriteLine($"🔍 DEBUG: pingBefore result = {pingBefore}");
                 // pingBefore = true; // Force true for now
                 // Debug.WriteLine($"🔍 DEBUG: Forced pingBefore = {pingBefore}");
@@ -850,9 +854,15 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 var sshConnectStarted = DateTime.Now;
                 commandSentAt = DateTime.Now;
 
-                // var sshResult = await ExecuteSystemSshReboot(sshConfig.Host, "toor4nsn", "oZPS0POrRieRtu");
-                var sshResult = await funImplementationServiceSshExecuteAsyncLocalDEV(sshConfig.Host, "toor4nsn", "oZPS0POrRieRtu");
-                
+                // sh chay cho server API, dung linux
+                var sshResult = await funImplementationServiceExecuteSystemSshRebootServerAPIDEV(sshConfig.Host, "toor4nsn", "oZPS0POrRieRtu");
+
+                Debug.WriteLine($"var sshResult = await funImplementationServiceExecuteSystemSshRebootServerAPIDEV(sshConfig.Host,");
+                Console.WriteLine($"var sshResult = await funImplementationServiceExecuteSystemSshRebootServerAPIDEV(sshConfig.Host,");
+
+                // sh chay cho local
+                // var sshResult = await funImplementationServiceSshExecuteAsyncLocalDEV(sshConfig.Host, "toor4nsn", "oZPS0POrRieRtu");
+
                 commandResponseReceived = DateTime.Now;
                 var sshConnectCompleted = DateTime.Now;
 
@@ -860,6 +870,9 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 rebootOutput = sshResult.Output;
 
                 Debug.WriteLine($"SSH Result: {(rebootSuccess ? "SUCCESS" : "FAILED")} - {rebootOutput}");
+                Console.WriteLine($"SSH Result: {(rebootSuccess ? "SUCCESS" : "FAILED")} - {rebootOutput}");
+
+
 
                 // ✅ UPDATE ALL CELLS WITH SAME RESULT
                 foreach (var cell in cells)
@@ -940,7 +953,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
 
 
-        private async Task<(bool Success, string Output)> ExecuteSystemSshReboot(string host, string username, string password, bool testOnly = false)
+        private async Task<(bool Success, string Output)> funImplementationServiceExecuteSystemSshRebootServerAPIDEV(string host, string username, string password, bool testOnly = false)
         {
             try
             {

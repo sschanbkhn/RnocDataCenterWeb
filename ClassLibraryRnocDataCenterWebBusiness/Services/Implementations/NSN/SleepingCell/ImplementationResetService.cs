@@ -300,10 +300,14 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                                     ["SshConnectStartedAt"] = cellResult.SshConnectStarted,
                                     ["SshConnectCompletedAt"] = cellResult.SshConnectCompleted,
                                     ["CommandSentAt"] = cellResult.CommandSentAt,
-                                    ["CommandResponseReceivedAt"] = cellResult.CommandResponseReceived
-                                
+                                    ["CommandResponseReceivedAt"] = cellResult.CommandResponseReceived,
 
-                            });
+
+
+                                    ["ExecutionDuration"] = DateTime.Now - startTime, 
+
+
+                                });
                             }
                         }
                         Debug.WriteLine($"📋 Starting archive for {detailRecords.Count} records...");
@@ -332,14 +336,16 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                     Debug.WriteLine($"⏳ Waiting 15 minutes for {successfulSites.Count} sites to restart...");
                     Debug.WriteLine($"🕐 Start time: {DateTime.Now:HH:mm:ss}");
 
-                    await Task.Delay(TimeSpan.FromMinutes(15)); // 15 minutes wait
+                    // await Task.Delay(TimeSpan.FromMinutes(15)); // 15 minutes wait
 
                     Debug.WriteLine($"🕐 Verification start time: {DateTime.Now:HH:mm:ss}");
                     Debug.WriteLine($"🔍 Starting verification for {successfulSites.Count} sites...");
 
                     // ✅ VERIFY ALL SUCCESSFUL SITES
-                    await VerifyResetResults(successfulSites, batchId);
+                    // await VerifyResetResults(successfulSites, batchId);
                 }
+
+                
 
                 var endTime = DateTime.Now;
                 var duration = endTime - startTime;
@@ -360,11 +366,11 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Bulk reset failed: {ex.Message}");
+                Debug.WriteLine($"❌ System_N8N_ reset failed: {ex.Message}");
                 return new BulkResetFromFilterTableResultDto
                 {
                     Success = false,
-                    Message = $"Bulk reset failed: {ex.Message}"
+                    Message = $"System_N8N_ reset failed: {ex.Message}"
                 };
             }
         }
@@ -418,7 +424,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                             detailRecord.ExecutionNotes = "Reset sent but verification failed";
                             failedVerificationCount++;
                         }
-
+                        
                         // Update ping after
                         await _detailRepository.UpdateResetResultAsync(detailRecord.Id, siteVerified, detailRecord.ExecutionNotes, "SYSTEM_VERIFICATION", new Dictionary<string, object>
                         {

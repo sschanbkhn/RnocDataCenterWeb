@@ -430,6 +430,8 @@ namespace ClassLibraryRnocDataCenterWebDataClass.Repositories.Implementations.NS
                     
                     record.CommandResponseReceivedAt = (DateTime)updatecellResult["CommandResponseReceivedAt"];
 
+                    record.ExecutionDuration = (TimeSpan)updatecellResult["ExecutionDuration"];
+
                     // Update execution notes
                     record.ExecutionNotes = success ?
                         $"Reset successful: {output}" :

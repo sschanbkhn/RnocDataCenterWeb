@@ -922,23 +922,54 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 // ✅ CHOOSE COMMAND BASED ON testOnly
                 var command = testOnly ? "echo 'SSH test successful'" : "reboot";
 
+                Debug.WriteLine($"🔌 var command = testOnly ? ");
+                Console.WriteLine($"🔌 var command = testOnly ? ");
+
                 var process = new System.Diagnostics.Process();
-                process.StartInfo.FileName = "ssh";
-                process.StartInfo.Arguments = $"-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'";
+
+
+                // process.StartInfo.FileName = "ssh";
+
+                // 🔧 THAY ĐỔI 1: Dùng sshpass thay vì ssh
+                process.StartInfo.FileName = "sshpass";
+
+                // process.StartInfo.Arguments = $"-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'";
+
+                // 🔧 THAY ĐỔI 2: Thêm -p 'password' vào arguments
+                process.StartInfo.Arguments = $"-p '{password}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'";
+
+
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.RedirectStandardInput = true;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
 
+
+                Debug.WriteLine($"🔌 Executing: sshpass -p [HIDDEN] ssh {username}@{host} {command}");
+                Console.WriteLine($"🔌 Executing: sshpass -p [HIDDEN] ssh {username}@{host} {command}");
+
+
+
+
+
+
+
+
+
+
+
                 Debug.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
                 Console.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
 
                 process.Start();
 
-                await process.StandardInput.WriteLineAsync(password);
-                await process.StandardInput.FlushAsync();
-                process.StandardInput.Close();
+                // 🔧 THAY ĐỔI 3: XÓA CÁC DÒNG StandardInput (không cần nữa)
+
+
+                // await process.StandardInput.WriteLineAsync(password);
+                // await process.StandardInput.FlushAsync();
+                // process.StandardInput.Close();
 
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();

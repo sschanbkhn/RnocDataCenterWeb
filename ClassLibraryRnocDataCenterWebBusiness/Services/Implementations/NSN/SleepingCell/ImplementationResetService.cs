@@ -1123,17 +1123,17 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                     if (!success)
                     {
+
+
+
+
+
                         // For reboot: có SSH response + không phải authentication error = SUCCESS
                         bool hasResponse = !string.IsNullOrEmpty(output) || !string.IsNullOrEmpty(error);
                         bool notAuthFailure = !error.Contains("Permission denied") &&
                                              !error.Contains("Authentication failed") &&
                                              !error.Contains("Connection refused");
 
-                        success = hasResponse && notAuthFailure;
-
-                        Console.WriteLine($"🔍 hasResponse: {hasResponse}");
-                        Console.WriteLine($"🔍 notAuthFailure: {notAuthFailure}");
-                        Console.WriteLine($"🔍 Final success: {success}");
 
                         // Check for connection failures specifically
                         if (error.Contains("Connection timed out") ||
@@ -1143,6 +1143,14 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                         {
                             return (false, $"SSH connection failed: {error}");
                         }
+
+
+                        success = hasResponse && notAuthFailure;
+
+                        Console.WriteLine($"🔍 hasResponse: {hasResponse}");
+                        Console.WriteLine($"🔍 notAuthFailure: {notAuthFailure}");
+                        Console.WriteLine($"🔍 Final success: {success}");
+
 
                     }
 

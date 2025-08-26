@@ -956,8 +956,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 // process.StartInfo.FileName = "ssh";
 
                 // 🔧 THAY ĐỔI 1: Dùng sshpass thay vì ssh
-                process.StartInfo.FileName = "sshpass";
-
+                // process.StartInfo.FileName = "sshpass";
+                process.StartInfo.FileName = "/usr/bin/sshpass";
                 // process.StartInfo.Arguments = $"-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'";
 
                 // 🔧 THAY ĐỔI 2: Thêm -p 'password' vào arguments
@@ -969,11 +969,19 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
 
+                Debug.WriteLine($"🔌 Executing: sshpass ssh  {process.StartInfo.Arguments}");
+                Console.WriteLine($"🔌 Executing: sshpass ssh {process.StartInfo.Arguments}");
+
+
+
+
+
 
                 Debug.WriteLine($"🔌 Executing: sshpass -p [HIDDEN] ssh {username}@{host} {command}");
                 Console.WriteLine($"🔌 Executing: sshpass -p [HIDDEN] ssh {username}@{host} {command}");
 
-
+                Debug.WriteLine($"🔌 Executing: sshpass ssh {process.StartInfo.FileName} {process.StartInfo.Arguments}");
+                Console.WriteLine($"🔌 Executing: sshpass ssh {process.StartInfo.FileName} {process.StartInfo.Arguments}");
 
 
 

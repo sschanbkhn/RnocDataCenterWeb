@@ -17,6 +17,7 @@ using System.Net.NetworkInformation;
 using Microsoft.Extensions.Hosting;
 
 
+
 using System.Threading;
 
 using System.Diagnostics;
@@ -966,11 +967,20 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.RedirectStandardInput = true;
+
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
 
-                Debug.WriteLine($"🔌 Executing: sshpass ssh  {process.StartInfo.Arguments}");
-                Console.WriteLine($"🔌 Executing: sshpass ssh {process.StartInfo.Arguments}");
+                process.StartInfo.WorkingDirectory = "/tmp";
+                process.StartInfo.Environment.Clear();
+                process.StartInfo.Environment["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin";
+                process.StartInfo.Environment["HOME"] = "/root";
+                process.StartInfo.Environment["USER"] = "root";
+
+
+
+                Debug.WriteLine($"🔌 {process.StartInfo.Arguments}");
+                Console.WriteLine($"🔌{process.StartInfo.Arguments}");
 
 
 
@@ -992,7 +1002,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
 
                 // Debug.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
-                Console.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
+                // Console.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
 
                 process.Start();
 
@@ -1006,6 +1016,15 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();
 
+
+                Console.WriteLine($"SSH output: {outputTask}");
+                Console.WriteLine($"SSH error: {errorTask}");
+
+
+
+                // ✅ THAY ĐỔI: Khởi tạo các tác vụ đọc luồng trước
+
+
                 // Timeout 15 giây quá ngắn cho reboot command!Server cần thời gian để:
 
                 // Nhận lệnh reboot
@@ -1015,6 +1034,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 // da test thu, cung tam 2 chuc giay tu luc send lenh den luc reboot
 
                 bool finished = process.WaitForExit(45000);
+                // ✅ THAY ĐỔI: Chờ cả hai tác vụ đọc và tiến trình thoát cùng lúc
+                // Đây là cách giải quyết deadlock
 
 
 
@@ -1052,6 +1073,21 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                 var output = await outputTask;
                 var error = await errorTask;
+
+
+
+
+
+                Console.WriteLine($"SSH output: {outputTask}");
+                Console.WriteLine($"SSH error: {errorTask}");
+
+
+
+                Debug.WriteLine($"SSH output: {output}");
+                Console.WriteLine($"SSH output: {output}");
+
+                Debug.WriteLine($"SSH error: {error}");
+                Console.WriteLine($"SSH error: {error}");
 
                 Debug.WriteLine($"SSH exit code: {process.ExitCode}");
                 Console.WriteLine($"SSH exit code: {process.ExitCode}");

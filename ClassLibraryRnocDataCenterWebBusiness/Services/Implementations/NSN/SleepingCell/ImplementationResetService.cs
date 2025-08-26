@@ -20,6 +20,8 @@ using Microsoft.Extensions.Hosting;
 using System.Threading;
 
 using System.Diagnostics;
+using Microsoft.AspNetCore.Hosting.Server;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.SleepingCell
 {
@@ -339,19 +341,19 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 }
 
                 Debug.WriteLine($"📡 Completed reset commands for all sites");
-                Debug.WriteLine($"✅ Successful: {successCount}, ❌ Failed: {failedCount}");
-
                 Console.WriteLine($"📡 Completed reset commands for all sites");
+                
+                Debug.WriteLine($"✅ Successful: {successCount}, ❌ Failed: {failedCount}");
                 Console.WriteLine($"✅ Successful: {successCount}, ❌ Failed: {failedCount}");
 
                 // ✅ NOW WAIT 15 MINUTES FOR ALL SITES
                 if (successfulSites.Count > 0)
                 {
                     Debug.WriteLine($"⏳ Waiting 15 minutes for {successfulSites.Count} sites to restart...");
-                    Debug.WriteLine($"🕐 Start time: {DateTime.Now:HH:mm:ss}");
-
-
                     Console.WriteLine($"⏳ Waiting 15 minutes for {successfulSites.Count} sites to restart...");
+
+
+                    Debug.WriteLine($"🕐 Start time: {DateTime.Now:HH:mm:ss}");
                     Console.WriteLine($"🕐 Start time: {DateTime.Now:HH:mm:ss}");
 
                     // await Task.Delay(TimeSpan.FromMinutes(15)); // 15 minutes wait
@@ -368,6 +370,10 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 var endTime = DateTime.Now;
                 var duration = endTime - startTime;
 
+                Debug.WriteLine($"⏳ var duration = endTime - startTime;");
+                Console.WriteLine($"⏳ var duration = endTime - startTime;");
+
+
                 return new BulkResetFromFilterTableResultDto
                 {
                     Success = true,
@@ -381,6 +387,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                     ExecutedBy = executedBy,
                     Message = $"Reset completed: {successCount}/{filterCells.Count()} successful, {failedCount} failed. Verification completed after 15min wait."
                 };
+
             }
             catch (Exception ex)
             {
@@ -392,6 +399,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                     Message = $"System_N8N_ reset failed: {ex.Message}"
                 };
             }
+
+
         }
 
 
@@ -911,7 +920,9 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Site {siteName} failed completely: {ex.Message}");
+                Debug.WriteLine($"❌ catch (Exception ex), Site {siteName} failed completely: {ex.Message}");
+                Console.WriteLine($"❌ catch (Exception ex), Site {siteName} failed completely: {ex.Message}");
+
                 result.CellResults = cells.Select(c => new CellResetResult
                 {
                     CellName = c.LncelName,
@@ -987,15 +998,23 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();
 
-                bool finished = process.WaitForExit(15000);
+                // Timeout 15 giây quá ngắn cho reboot command!Server cần thời gian để:
 
-                Debug.WriteLine($"🔌 bool finished = process.WaitForExit(15000);");
-                Console.WriteLine($"🔌 bool finished = process.WaitForExit(15000);");
+                // Nhận lệnh reboot
+                // Shutdown services
+                // Actually reboot
+                // SSH connection bị drop
+                // da test thu, cung tam 2 chuc giay tu luc send lenh den luc reboot
+
+                bool finished = process.WaitForExit(45000);
+
+                Debug.WriteLine($"🔌 bool finished = process.WaitForExit(45000);");
+                Console.WriteLine($"🔌 bool finished = process.WaitForExit(45000);");
 
                 if (!finished)
                 {
                     process.Kill();
-                    return (false, "SSH timeout after 15 seconds");
+                    return (false, "SSH timeout after 45 seconds");
                 }
 
                 var output = await outputTask;

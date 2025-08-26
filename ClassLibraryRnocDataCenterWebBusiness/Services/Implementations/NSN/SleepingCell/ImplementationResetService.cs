@@ -1069,8 +1069,35 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 else
                 {
                     // For reboot, exit code 0 or 255 (connection dropped)
-                    success = process.ExitCode == 0 || process.ExitCode == 255;
+                    success = process.ExitCode == 0 || process.ExitCode == 255 || process.ExitCode == 5;
+                    Console.WriteLine($"🔍 Final success: success = process.ExitCode == 0 || process.ExitCode == 255 || process.ExitCode == 5;");
+                    Console.WriteLine($"🔍 Final success: {success}");
+
+                    if (!success)
+                    {
+                        // For reboot: có SSH response + không phải authentication error = SUCCESS
+                        bool hasResponse = !string.IsNullOrEmpty(output) || !string.IsNullOrEmpty(error);
+                        bool notAuthFailure = !error.Contains("Permission denied") &&
+                                             !error.Contains("Authentication failed") &&
+                                             !error.Contains("Connection refused");
+
+                        success = hasResponse && notAuthFailure;
+
+                        Console.WriteLine($"🔍 hasResponse: {hasResponse}");
+                        Console.WriteLine($"🔍 notAuthFailure: {notAuthFailure}");
+                        Console.WriteLine($"🔍 Final success: {success}");
+
+                    }
+
+
+
+
+
                 }
+
+
+
+
 
                 string resultMessage = testOnly
                     ? (success ? "SSH connection verified" : $"SSH test failed: {output} {error}")

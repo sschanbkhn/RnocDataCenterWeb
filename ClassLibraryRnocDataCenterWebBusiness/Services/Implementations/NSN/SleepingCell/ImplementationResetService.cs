@@ -1147,15 +1147,6 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
 
 
-                /*
-
-                string resultMessage = testOnly
-                        ? (success ? "SSH connection verified" : $"SSH test failed: {output} {error}") :
-                                 (success ? "Reboot executed via system SSH" : $"Reboot failed: {output} {error}");
-
-                */
-
-
 
                 string resultMessage = success
                     ? "Reboot executed via system SSH by System"

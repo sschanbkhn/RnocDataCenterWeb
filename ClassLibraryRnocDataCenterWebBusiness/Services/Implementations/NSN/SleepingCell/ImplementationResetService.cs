@@ -854,6 +854,11 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 var sshConnectStarted = DateTime.Now;
                 commandSentAt = DateTime.Now;
 
+
+                Debug.WriteLine($"🔍 commandSentAt = DateTime.Now;");
+                Console.WriteLine($"🔍 commandSentAt = DateTime.Now;,");
+
+
                 // sh chay cho server API, dung linux
                 var sshResult = await funImplementationServiceExecuteSystemSshRebootServerAPIDEV(sshConfig.Host, "toor4nsn", "oZPS0POrRieRtu");
 
@@ -871,6 +876,14 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                 Debug.WriteLine($"SSH Result: {(rebootSuccess ? "SUCCESS" : "FAILED")} - {rebootOutput}");
                 Console.WriteLine($"SSH Result: {(rebootSuccess ? "SUCCESS" : "FAILED")} - {rebootOutput}");
+
+
+
+
+
+
+
+
 
 
 

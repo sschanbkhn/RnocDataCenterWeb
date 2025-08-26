@@ -1008,14 +1008,39 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                 bool finished = process.WaitForExit(45000);
 
+
+
                 Debug.WriteLine($"🔌 bool finished = process.WaitForExit(45000);");
                 Console.WriteLine($"🔌 bool finished = process.WaitForExit(45000);");
 
                 if (!finished)
                 {
+                    // doan nay nghia la server van con chay du qua time
                     process.Kill();
-                    return (false, "SSH timeout after 45 seconds");
+                    // Đối với reboot, timeout có thể là success
+                    // bool timeoutSuccess = !testOnly; // reboot timeout = có thể thành công
+
+                    return (false, "SSH timeout after 45 seconds, ko reboot duoc");
                 }
+                else
+                {
+                    // nghia la process se ket thuc truoc 45s
+                    Debug.WriteLine($"SSH reboot truoc process.WaitForExit(45000)");
+                    Console.WriteLine($"SSH reboot truoc process.WaitForExit(45000)");
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 var output = await outputTask;
                 var error = await errorTask;
@@ -1023,8 +1048,16 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 Debug.WriteLine($"SSH exit code: {process.ExitCode}");
                 Console.WriteLine($"SSH exit code: {process.ExitCode}");
 
-                if (!string.IsNullOrEmpty(output)) Debug.WriteLine($"SSH output: {output}");
-                if (!string.IsNullOrEmpty(error)) Debug.WriteLine($"SSH error: {error}");
+                if (!string.IsNullOrEmpty(output))
+                {
+                    Debug.WriteLine($"SSH output: {output}");
+                    Console.WriteLine($"SSH output: {output}");
+                }
+                if (!string.IsNullOrEmpty(error))
+                {
+                    Debug.WriteLine($"SSH error: {error}");
+                    Console.WriteLine($"SSH error: {error}");
+                }
 
                 // ✅ SUCCESS CONDITIONS BASED ON COMMAND TYPE
                 bool success;

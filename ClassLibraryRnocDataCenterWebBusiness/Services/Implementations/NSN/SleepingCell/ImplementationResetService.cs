@@ -940,7 +940,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
         }
 
 
-        /*
+        
 
 
         private async Task<(bool Success, string Output)> funImplementationServiceExecuteSystemSshRebootServerAPIDEV(string host, string username, string password, bool testOnly = false)
@@ -949,7 +949,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
             {
                 // ✅ CHOOSE COMMAND BASED ON testOnly
                 // var command = testOnly ? "echo 'SSH test successful'" : "reboot";
-                var command = "uptime";
+                var command = "reboot";
 
                 Debug.WriteLine($"🔌 var command = {command} ");
                 Console.WriteLine($"🔌 var command = {command} ");
@@ -959,14 +959,28 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                 // process.StartInfo.FileName = "ssh";
 
+
+
+
                 // 🔧 THAY ĐỔI 1: Dùng sshpass thay vì ssh
                 // process.StartInfo.FileName = "sshpass";
-                process.StartInfo.FileName = "/usr/bin/sshpass";
+                // process.StartInfo.FileName = "/usr/bin/sshpass";
                 // process.StartInfo.Arguments = $"-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'";
 
                 // 🔧 THAY ĐỔI 2: Thêm -p 'password' vào arguments
-                process.StartInfo.Arguments = $"-p '{password}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'";
-                
+                // process.StartInfo.Arguments = $"-p '{password}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'";
+
+
+                process.StartInfo.FileName = "/bin/bash";
+
+                // process.StartInfo.Arguments = $"-c \"sshpass -p '{password}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} 'uptime'\"";
+                process.StartInfo.Arguments = $"-c \"sshpass -p '{password}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'\"";
+
+
+
+
+
+
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.RedirectStandardInput = true;
@@ -1002,11 +1016,6 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
 
 
-
-
-                // Debug.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
-                // Console.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
-
                 process.Start();
 
                 // 🔧 THAY ĐỔI 3: XÓA CÁC DÒNG StandardInput (không cần nữa)
@@ -1019,9 +1028,6 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();
 
-
-                Console.WriteLine($"SSH output: {outputTask}");
-                Console.WriteLine($"SSH error: {errorTask}");
 
 
 
@@ -1077,13 +1083,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 var output = await outputTask;
                 var error = await errorTask;
 
-
-
-
-
-                Console.WriteLine($"SSH output: {outputTask}");
-                Console.WriteLine($"SSH error: {errorTask}");
-
+                // string output = process.StandardOutput.ReadToEnd();
+                // string error = process.StandardError.ReadToEnd();
 
 
                 Debug.WriteLine($"SSH output: {output}");
@@ -1144,11 +1145,33 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
 
 
-
+                /*
 
                 string resultMessage = testOnly
-                    ? (success ? "SSH connection verified" : $"SSH test failed: {output} {error}")
-                    : (success ? "Reboot executed via system SSH" : $"Reboot failed: {output} {error}");
+                        ? (success ? "SSH connection verified" : $"SSH test failed: {output} {error}") :
+                                 (success ? "Reboot executed via system SSH" : $"Reboot failed: {output} {error}");
+
+                */
+
+
+
+                string resultMessage = success
+                    ? "Reboot executed via system SSH by System"
+                    : $"Reboot failed: {error}";
+
+
+                /*
+
+                if (success)
+                {
+                    resultMessage = "Reboot executed via system SSH";
+                }
+                else
+                {
+                    resultMessage = $"Reboot failed: {output} {error}";
+                }
+
+                */
 
                 return (success, resultMessage);
             }
@@ -1159,7 +1182,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
         }
 
 
-        */
+        /*
 
         private async Task<(bool Success, string Output)> funImplementationServiceExecuteSystemSshRebootServerAPIDEV(string host, string username, string password)
         {
@@ -1211,7 +1234,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
             }
         }
 
-
+        */
 
 
         // ✅ WINDOWS 10 COMPATIBLE PING METHOD

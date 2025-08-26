@@ -957,10 +957,6 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 var process = new System.Diagnostics.Process();
 
 
-                // process.StartInfo.FileName = "ssh";
-
-
-
 
                 // 🔧 THAY ĐỔI 1: Dùng sshpass thay vì ssh
                 // process.StartInfo.FileName = "sshpass";
@@ -1117,9 +1113,13 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 else
                 {
                     // For reboot, exit code 0 or 255 (connection dropped)
-                    success = process.ExitCode == 0 || process.ExitCode == 255 || process.ExitCode == 5;
-                    Console.WriteLine($"🔍 Final success: success = process.ExitCode == 0 || process.ExitCode == 255 || process.ExitCode == 5;");
+                    // success = process.ExitCode == 0 || process.ExitCode == 255 || process.ExitCode == 5;
+                    success = process.ExitCode == 0;
+                    // Console.WriteLine($"🔍 Final success: success = process.ExitCode == 0 || process.ExitCode == 255 || process.ExitCode == 5;");
                     Console.WriteLine($"🔍 Final success: {success}");
+
+
+
 
                     if (!success)
                     {
@@ -1134,6 +1134,15 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                         Console.WriteLine($"🔍 hasResponse: {hasResponse}");
                         Console.WriteLine($"🔍 notAuthFailure: {notAuthFailure}");
                         Console.WriteLine($"🔍 Final success: {success}");
+
+                        // Check for connection failures specifically
+                        if (error.Contains("Connection timed out") ||
+                            error.Contains("Connection refused") ||
+                            error.Contains("No route to host")
+                                )
+                        {
+                            return (false, $"SSH connection failed: {error}");
+                        }
 
                     }
 

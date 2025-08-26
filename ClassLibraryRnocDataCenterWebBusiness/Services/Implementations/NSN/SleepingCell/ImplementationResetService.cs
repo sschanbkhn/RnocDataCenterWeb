@@ -944,10 +944,11 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
             try
             {
                 // ✅ CHOOSE COMMAND BASED ON testOnly
-                var command = testOnly ? "echo 'SSH test successful'" : "reboot";
+                // var command = testOnly ? "echo 'SSH test successful'" : "reboot";
+                var command = "uptime";
 
-                Debug.WriteLine($"🔌 var command = testOnly ? ");
-                Console.WriteLine($"🔌 var command = testOnly ? ");
+                Debug.WriteLine($"🔌 var command = {command} ");
+                Console.WriteLine($"🔌 var command = {command} ");
 
                 var process = new System.Diagnostics.Process();
 
@@ -961,8 +962,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
                 // 🔧 THAY ĐỔI 2: Thêm -p 'password' vào arguments
                 process.StartInfo.Arguments = $"-p '{password}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'";
-
-
+                
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.RedirectStandardInput = true;
@@ -983,7 +983,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
 
 
-                Debug.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
+                // Debug.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
                 Console.WriteLine($"🔌 Executing: ssh {username}@{host} {command}");
 
                 process.Start();
@@ -1110,6 +1110,10 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                 return (false, $"System SSH error: {ex.Message}");
             }
         }
+
+
+
+
 
 
 

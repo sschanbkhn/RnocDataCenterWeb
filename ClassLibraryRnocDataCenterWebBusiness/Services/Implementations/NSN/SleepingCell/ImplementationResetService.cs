@@ -1161,101 +1161,55 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
 
         */
 
-
         private async Task<(bool Success, string Output)> funImplementationServiceExecuteSystemSshRebootServerAPIDEV(string host, string username, string password)
         {
             try
             {
-                var command = "uptime";
+                Console.WriteLine($"Executing uptime command on {host}");
 
-                Debug.WriteLine($"🔌 var command = {command}");
-                Console.WriteLine($"🔌 var command = {command}");
+                var process = new Process();
+                process.StartInfo.FileName = "/bin/bash";
+                process.StartInfo.Arguments = $"-c \"sshpass -p '{password}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} 'uptime'\"";
 
-                var process = new System.Diagnostics.Process
-                {
-                    StartInfo = new System.Diagnostics.ProcessStartInfo
-                    {
-                        FileName = "/usr/bin/sshpass",
-                        Arguments = $"-p '{password}' ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 {username}@{host} '{command}'",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        WorkingDirectory = "/tmp"
-                    }
-                };
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
 
                 process.StartInfo.Environment.Clear();
                 process.StartInfo.Environment["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin";
                 process.StartInfo.Environment["HOME"] = "/root";
-                process.StartInfo.Environment["USER"] = "root";
-
-                Debug.WriteLine($"🔌 Arguments: {process.StartInfo.Arguments}");
-                Console.WriteLine($"🔌 Arguments: {process.StartInfo.Arguments}");
-
-                Debug.WriteLine($"🔌 Executing: sshpass -p [HIDDEN] ssh {username}@{host} {command}");
-                Console.WriteLine($"🔌 Executing: sshpass -p [HIDDEN] ssh {username}@{host} {command}");
 
                 process.Start();
 
-                var outputTask = process.StandardOutput.ReadToEndAsync();
-                var errorTask = process.StandardError.ReadToEndAsync();
-
-                bool finished = process.WaitForExit(10000);
-
-                Debug.WriteLine($"🔌 bool finished = process.WaitForExit(10000);");
-                Console.WriteLine($"🔌 bool finished = process.WaitForExit(10000);");
+                bool finished = process.WaitForExit(45000);
 
                 if (!finished)
                 {
                     process.Kill();
-                    return (false, "SSH timeout after 10 seconds");
-                }
-                else
-                {
-                    Debug.WriteLine($"SSH completed before timeout");
-                    Console.WriteLine($"SSH completed before timeout");
+                    return (false, "SSH timeout after 45 seconds");
                 }
 
-                var output = await outputTask;
-                var error = await errorTask;
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
 
-                if (!string.IsNullOrEmpty(output))
-                {
-                    Debug.WriteLine($"SSH output: {output}");
-                    Console.WriteLine($"SSH output: {output}");
-                }
-                if (!string.IsNullOrEmpty(error))
-                {
-                    if (error.Contains("You are about to access a private system") || error.Contains("Permanently added"))
-                    {
-                        Debug.WriteLine("Ignoring SSH banner message");
-                        Console.WriteLine("Ignoring SSH banner message");
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"SSH error: {error}");
-                        Console.WriteLine($"SSH error: {error}");
-                    }
-                }
+                Console.WriteLine($"SSH Exit Code: {process.ExitCode}");
+                Console.WriteLine($"SSH Output: [{output}]");
+                Console.WriteLine($"SSH Error: [{error}]");
 
-                Debug.WriteLine($"SSH exit code: {process.ExitCode}");
-                Console.WriteLine($"SSH exit code: {process.ExitCode}");
+                // Uptime success: exit code 0 and has uptime data
+                bool success = process.ExitCode == 0 &&
+                               !string.IsNullOrEmpty(output) &&
+                               (output.Contains("load average") || output.Contains("up"));
 
-                bool success = process.ExitCode == 0 && !string.IsNullOrEmpty(output);
-                Console.WriteLine($"🔍 Final success: success = process.ExitCode == 0 && !string.IsNullOrEmpty(output);");
-                Console.WriteLine($"🔍 Final success: {success}");
-
-                string resultMessage = success ? $"Uptime retrieved via system SSH: {output}" : $"Uptime failed: {output} {error}";
-                return (success, resultMessage);
+                string result = success ? output.Trim() : $"Uptime failed: {error}";
+                return (success, result);
             }
             catch (Exception ex)
             {
-                return (false, $"System SSH error: {ex.Message}");
+                return (false, $"SSH error: {ex.Message}");
             }
         }
-
-
 
 
 

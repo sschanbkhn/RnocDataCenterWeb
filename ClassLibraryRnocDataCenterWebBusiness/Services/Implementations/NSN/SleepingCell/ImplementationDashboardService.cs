@@ -825,7 +825,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                         province = x.Province,
                         district = x.District,
                         execution_status = x.ExecutionStatus,
-                        archived_at = x.ArchivedAt
+                        period_start_time = x.PeriodStartTime,
+                        ssh_host = x.SshHost
                     })
                     .ToListAsync();
 
@@ -852,7 +853,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                         province = x.Province,
                         district = x.District,
                         execution_status = x.ExecutionStatus,
-                        archived_at = x.ArchivedAt
+                        period_start_time = x.PeriodStartTime,
+                        ssh_host = x.SshHost
                     })
                     .ToListAsync();
 
@@ -880,7 +882,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
                         province = x.Province,
                         district = x.District,
                         execution_status = x.ExecutionStatus,
-                        archived_at = x.ArchivedAt
+                        period_start_time = x.PeriodStartTime,
+                        ssh_host = x.SshHost
                     })
                     .ToListAsync();
 

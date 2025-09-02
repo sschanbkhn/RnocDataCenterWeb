@@ -251,7 +251,29 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
         }
 
 
-
+        /// <summary>
+        /// Get KPI Monitor data with pagination and filters
+        /// </summary>
+        [HttpGet("kpi-monitor/cell-detail/{cellName}")]
+        public async Task<IActionResult> GetKpiMonitorDataSelectCellDetail(
+                        string cellName,
+            [FromQuery] string? date = null)
+        {
+            try
+            {
+                var result = await _kpiMonitorService.funMonitorServiceGetKpiMonitorDataSelectCellDetail(cellName, date);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Error retrieving filter options",
+                    error = ex.Message
+                });
+            }
+        }
 
 
 

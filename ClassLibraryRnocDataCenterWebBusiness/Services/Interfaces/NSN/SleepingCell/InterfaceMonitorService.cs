@@ -41,6 +41,9 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Interfaces.NSN.Sleeping
         // Thêm vào InterfaceMonitorService
         Task<object> funMonitorServiceGetKpiMonitorDataRangeAsync(KpiMonitorDateRangeRequest request);
 
+
+        Task<object> funMonitorServiceGetKpiMonitorDataSelectCellDetail(string cellName, string date);
+
     }
 
 }

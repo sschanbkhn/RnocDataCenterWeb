@@ -9,13 +9,13 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
 {
     [ApiController]
-    [Route("api/dashboard")]
+    [Route("api/sleeping-cell/dashboard")]
     [Produces("application/json")]
-    public class DashboardApiController : ControllerBase
+    public class SleepingCellDashboardApiController : ControllerBase
     {
         private readonly InterfaceDashboardService _dashboardService;
 
-        public DashboardApiController(InterfaceDashboardService dashboardService)
+        public SleepingCellDashboardApiController(InterfaceDashboardService dashboardService)
         {
             _dashboardService = dashboardService;
         }

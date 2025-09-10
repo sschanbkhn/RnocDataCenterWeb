@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\NSN\SleepingCell\SleepingCellApiController.cs" />
     <Compile Remove="Controllers\NSN\SleepingCell\WebApiBuildSleepingCellController.cs" />
     <Compile Remove="Controllers\NSN\SleepingCell\WebApiBuildSleepingCellController_1.cs" />
     <Compile Remove="Controllers\NSN\SleepingCell\WebApiBuildSleepingCellController_2.cs" />

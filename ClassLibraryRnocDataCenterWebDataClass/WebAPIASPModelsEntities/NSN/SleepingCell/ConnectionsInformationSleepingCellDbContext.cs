@@ -45,6 +45,12 @@ public partial class ConnectionsInformationSleepingCellDbContext : DbContext
 
     public virtual DbSet<Outlook> Outlooks { get; set; }
 
+
+    public virtual DbSet<Objtabledatabaseinfor> Objtabledatabaseinfors  { get; set; }
+
+    // public DbSet<Objtabledatabaseinfor> Objtabledatabaseinfors { get; set; } // ✅ Match với Entity name
+
+
     public virtual DbSet<Tablefilepath> Tablefilepaths { get; set; }
 
     public virtual DbSet<VKpiArchiveSummary> VKpiArchiveSummaries { get; set; }

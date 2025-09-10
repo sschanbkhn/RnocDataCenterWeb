@@ -12,7 +12,6 @@
     <Folder Include="WebAPIASPModelsEntities\Ericsson\Declare5G\" />
     <Folder Include="WebAPIASPModelsEntities\Ericsson\SleepingCellsManagements\" />
     <Folder Include="WebAPIASPModelsEntities\NSN\Declare5G\" />
-    <Folder Include="WebAPIASPModelsEntities\NSN\SleepingCell\" />
     <Folder Include="WebAPIASPModelsEntities\OSS\DCAP\" />
     <Folder Include="WebAPIASPModelsEntities\Reports\" />
     <Folder Include="Seeds\" />

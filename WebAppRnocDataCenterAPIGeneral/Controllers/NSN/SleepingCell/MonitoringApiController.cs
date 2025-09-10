@@ -7,13 +7,13 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
 
 
     [ApiController]
-    [Route("api/monitoring")]
+    [Route("api/sleeping-cell/monitoring")]
     [Produces("application/json")]
-    public class MonitoringApiController : ControllerBase
+    public class SleepingCellMonitoringApiController : ControllerBase
     {
         private readonly InterfaceMonitorService _kpiMonitorService;
 
-        public MonitoringApiController(InterfaceMonitorService kpiMonitorService)
+        public SleepingCellMonitoringApiController(InterfaceMonitorService kpiMonitorService)
         {
             _kpiMonitorService = kpiMonitorService;
         }

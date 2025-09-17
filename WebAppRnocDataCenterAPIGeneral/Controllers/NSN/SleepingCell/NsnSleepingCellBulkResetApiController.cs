@@ -64,21 +64,8 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
             try
             {
                 // var result = await _resetService.funImplementationServicesResetAllFilterTableCellsAsync("SYSTEM_N8N_RESET");
-                // var result = await _resetService.funImplementationServicesResetAllFilterTableCellsAsync("SYSTEM_N8N_RESET");
-                // Call reset service với cell cụ thể
-                // Validate: phải có ít nhất 1 trong 3 parameters
-                /*
-                if (string.IsNullOrEmpty(request.CellName) &&
-                    string.IsNullOrEmpty(request.MrbtsName) &&
-                    !request.MrbtsId.HasValue)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "At least one of CellName, MrbtsName, or MrbtsId must be provided"
-                    });
-                }
-                */
+                
+
 
                 if (string.IsNullOrEmpty(request.Ssh_Host_IP))
                 {

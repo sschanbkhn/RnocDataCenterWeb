@@ -11,12 +11,12 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
     [ApiController]
     [Route("api/sleeping-cell/configuration")]
     [Produces("application/json")]
-    public class ConfigApiController : ControllerBase
+    public class SleepingCellConfigApiController : ControllerBase
     {
 
         private readonly ConnectionsInformationSleepingCellDbContext _context;
 
-        public ConfigApiController(ConnectionsInformationSleepingCellDbContext context)
+        public SleepingCellConfigApiController(ConnectionsInformationSleepingCellDbContext context)
         {
             _context = context;
         }
@@ -60,16 +60,11 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
         {
             try
             {
-                try
-                {
+
                     _context.Outlooks.Add(config);
                     await _context.SaveChangesAsync();
                     return CreatedAtAction(nameof(GetOutlookConfig), new { id = config.Id }, config);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { error = ex.Message });
-                }
+
             }
             catch (Exception ex)
             {
@@ -158,7 +153,8 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
 
                 _context.Tablefilepaths.Add(config);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetOutlookConfig), new { id = config.Id }, config);
+                
+                return CreatedAtAction(nameof(GetFilePathConfig), new { id = config.Id }, config);
 
 
             }
@@ -388,7 +384,7 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
                 existingConfig.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
-                return Ok(config);
+                return Ok(existingConfig);
             }
             catch (Exception ex)
             {
@@ -478,7 +474,7 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
                 existingConfig.Active = config.Active;
 
                 await _context.SaveChangesAsync();
-                return Ok(config);
+                return Ok(existingConfig);
             }
             catch (Exception ex)
             {
@@ -507,7 +503,7 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
         // ===========================
         // 6. database ACCOUNT SETTINGS
         // ===========================
-        [HttpGet("get-database")]
+        [HttpGet("get-infor-database")]
         public async Task<IActionResult> GetAccountDatabaseConfigs()
         {
             try
@@ -551,7 +547,7 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
             }
         }
 
-        [HttpPut("Update-database/{id}")]
+        [HttpPut("update-database/{id}")]
         public async Task<IActionResult> UpdateAccDatabaseConfig(int id, [FromBody] Objtabledatabaseinfor config)
         {
             try
@@ -566,8 +562,11 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
                 existingConfig.DatabaseName = config.DatabaseName;
                 existingConfig.Username = config.Username;
                 existingConfig.Password = config.Password;
+                existingConfig.Active = config.Active;
                 existingConfig.SslMode = config.SslMode;
                 existingConfig.TrustServerCertificate = config.TrustServerCertificate;
+                
+
 
                 await _context.SaveChangesAsync();
                 return Ok(existingConfig);
@@ -599,14 +598,14 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
         // ===========================
         // 7. SSH ACCOUNT MANAGEMENT (Card mới)
         // ===========================
-        [HttpGet("ssh-accounts")]
+        [HttpGet("get-ssh-accounts")]
         public async Task<IActionResult> GetSshAccountsManagement()
         {
             try
             {
                 // Có thể dùng cùng bảng nhưng với logic khác hoặc view khác
                 var configs = await _context.Objtableaccountsshes
-                    .Where(x => x.Active == true) // Ví dụ: chỉ lấy active accounts
+                    // .Where(x => x.Active == true) // Ví dụ: chỉ lấy active accounts
                     .ToListAsync();
                 return Ok(configs);
             }
@@ -615,6 +614,98 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+
+        [HttpGet("get-ssh-accounts/{id}")]
+        public async Task<IActionResult> GetSshAccountsManagement(int id)
+        {
+            try
+            {
+                var config = await _context.Objtableaccountsshes.FindAsync(id);
+                if (config == null) return NotFound();
+                return Ok(config);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
+
+        [HttpPost("add-ssh-accounts")]
+        public async Task<IActionResult> CreateSshAccount([FromBody] Objtableaccountssh config)
+        {
+            // Implementation
+            try
+            {
+                _context.Objtableaccountsshes.Add(config);
+                await _context.SaveChangesAsync();
+                // return CreatedAtAction(nameof(CreateSshAccount), new { id = config.Id }, config);
+                // return CreatedAtAction(nameof(CreateSshAccount), new { id = config.Id }, config);
+                // SSH create endpoint
+
+                // Should be:
+                return CreatedAtAction(nameof(GetSshAccountsManagement), new { id = config.Id }, config);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPut("update-ssh-accounts/{id}")]
+        public async Task<IActionResult> UpdateSshAccount(int id, [FromBody] Objtableaccountssh config)
+        {
+            // Implementation
+            try
+            {
+                var existingConfig = await _context.Objtableaccountsshes.FindAsync(id); // ✅ Database context
+                if (existingConfig == null) return NotFound();
+
+                existingConfig.Sttaccountssh = config.Sttaccountssh;
+                // existingConfig.Password = config.Password;
+                existingConfig.System = config.System;
+
+                existingConfig.Usename = config.Usename;
+                // existingConfig.Username = config.Username;
+                existingConfig.Password = config.Password;
+
+
+                existingConfig.Port = config.Port;
+
+                existingConfig.Active = config.Active;
+                // existingConfig.TrustServerCertificate = config.TrustServerCertificate;
+
+                await _context.SaveChangesAsync();
+                return Ok(existingConfig);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpDelete("delete-ssh-accounts/{id}")]
+        public async Task<IActionResult> DeleteSshAccount(int id)
+        {
+            // Implementation
+            try
+            {
+                var config = await _context.Objtableaccountsshes.FindAsync(id);
+                if (config == null) return NotFound();
+
+                _context.Objtableaccountsshes.Remove(config);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
 
         // ===========================
         // 8. ARCHIVE REPORTS
@@ -663,9 +754,113 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
             }
         }
 
-        /*
+        [HttpGet("archive-reports-date")]
+        public async Task<IActionResult> GetArchiveReports(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 50,
+    [FromQuery] string startDate = "",
+    [FromQuery] string endDate = "",
+    [FromQuery] string province = "",
+    [FromQuery] string district = "",
+    [FromQuery] string vendor = "",
+    [FromQuery] string searchTerm = "")
+        {
+            try
+            {
+                var query = _context.Objtable4gkpireportresultdetailarchives.AsQueryable();
 
-        [HttpDelete("archive-reports/{id}")]
+                // Date filters
+                if (!string.IsNullOrEmpty(startDate) && DateTime.TryParse(startDate, out var start))
+                {
+                    query = query.Where(x => x.ArchivedAt >= start);
+                }
+
+                if (!string.IsNullOrEmpty(endDate) && DateTime.TryParse(endDate, out var end))
+                {
+                    query = query.Where(x => x.ArchivedAt <= end.AddDays(1));
+                }
+
+                // Location filters
+                if (!string.IsNullOrEmpty(province))
+                {
+                    query = query.Where(x => x.Province == province);
+                }
+
+                if (!string.IsNullOrEmpty(district))
+                {
+                    query = query.Where(x => x.District == district);
+                }
+
+                // Vendor filter
+                if (!string.IsNullOrEmpty(vendor))
+                {
+                    query = query.Where(x => x.Vendor == vendor);
+                }
+
+                // Search filter
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    query = query.Where(x =>
+                        x.MrbtsName.Contains(searchTerm) ||
+                        x.Province.Contains(searchTerm) ||
+                        x.District.Contains(searchTerm) ||
+                        x.Vendor.Contains(searchTerm));
+                }
+
+                // Tăng pageSize limit
+                pageSize = Math.Min(pageSize, 2000);
+
+                var totalRecords = await query.CountAsync();
+                var reports = await query
+                    .OrderByDescending(x => x.ArchivedAt)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    data = reports,
+                    totalRecords,
+                    page,
+                    pageSize,
+                    totalPages = (int)Math.Ceiling((double)totalRecords / pageSize)
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
+
+
+        [HttpPut("update-archive-report/{id}")]
+        public async Task<IActionResult> UpdateArchiveReport(long id, [FromBody] Objtable4gkpireportresultdetailarchive report)
+        {
+            try
+            {
+                var existingReport = await _context.Objtable4gkpireportresultdetailarchives.FindAsync(id);
+                if (existingReport == null) return NotFound();
+
+                // Cập nhật các field (điều chỉnh theo entity thực tế của bạn)
+                existingReport.UserNotes = report.UserNotes;
+                existingReport.ActionBlacklist = report.ActionBlacklist;
+                existingReport.ResetPermission = report.ResetPermission;
+                // Thêm các field khác tùy theo entity
+
+                await _context.SaveChangesAsync();
+                return Ok(existingReport);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
+
+        [HttpDelete("delete-archive-reports/{id}")]
         public async Task<IActionResult> DeleteArchiveReport(long id)
         {
             try
@@ -683,7 +878,122 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
             }
         }
 
-        */
+
+
+        [HttpGet("get-archive-provinces")]
+        public async Task<IActionResult> GetArchiveProvinces(
+            [FromQuery] string startDate = "",
+            [FromQuery] string endDate = "")
+        {
+            try
+            {
+                var query = _context.Objtable4gkpireportresultdetailarchives
+            .Where(x => !string.IsNullOrEmpty(x.Province));
+
+                // Lọc theo ngày nếu có
+                if (!string.IsNullOrEmpty(startDate) && DateTime.TryParse(startDate, out var start))
+                {
+                    query = query.Where(x => x.ArchivedAt >= start);
+                }
+
+                if (!string.IsNullOrEmpty(endDate) && DateTime.TryParse(endDate, out var end))
+                {
+                    query = query.Where(x => x.ArchivedAt <= end.AddDays(1));
+                }
+
+                var provinces = await query
+                    .Select(x => x.Province)
+                    .Distinct()
+                    .OrderBy(x => x)
+                    .ToListAsync();
+
+
+                return Ok(provinces);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("get-archive-districts")]
+        public async Task<IActionResult> GetArchiveDistricts(
+    [FromQuery] string province = "",
+    [FromQuery] string startDate = "",
+    [FromQuery] string endDate = "")
+        {
+            try
+            {
+                var query = _context.Objtable4gkpireportresultdetailarchives
+                    .Where(x => !string.IsNullOrEmpty(x.District));
+
+                // Lọc theo tỉnh
+                if (!string.IsNullOrEmpty(province))
+                {
+                    query = query.Where(x => x.Province == province);
+                }
+
+                // Lọc theo ngày
+                if (!string.IsNullOrEmpty(startDate) && DateTime.TryParse(startDate, out var start))
+                {
+                    query = query.Where(x => x.ArchivedAt >= start);
+                }
+
+                if (!string.IsNullOrEmpty(endDate) && DateTime.TryParse(endDate, out var end))
+                {
+                    query = query.Where(x => x.ArchivedAt <= end.AddDays(1));
+                }
+
+                var districts = await query
+                    .Select(x => x.District)
+                    .Distinct()
+                    .OrderBy(x => x)
+                    .ToListAsync();
+
+                return Ok(districts);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("get-archive-vendors")]
+        public async Task<IActionResult> GetArchiveVendors(
+    [FromQuery] string startDate = "",
+    [FromQuery] string endDate = "")
+        {
+            try
+            {
+                var query = _context.Objtable4gkpireportresultdetailarchives
+                    .Where(x => !string.IsNullOrEmpty(x.Vendor));
+
+                // Lọc theo ngày
+                if (!string.IsNullOrEmpty(startDate) && DateTime.TryParse(startDate, out var start))
+                {
+                    query = query.Where(x => x.ArchivedAt >= start);
+                }
+
+                if (!string.IsNullOrEmpty(endDate) && DateTime.TryParse(endDate, out var end))
+                {
+                    query = query.Where(x => x.ArchivedAt <= end.AddDays(1));
+                }
+
+                var vendors = await query
+                    .Select(x => x.Vendor)
+                    .Distinct()
+                    .OrderBy(x => x)
+                    .ToListAsync();
+
+                return Ok(vendors);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
 
         // ===========================
         // SEARCH ENDPOINTS

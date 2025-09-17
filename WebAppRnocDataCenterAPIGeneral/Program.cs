@@ -28,7 +28,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Đọc cấu hình IsLocal từ appsettings.Local.json
 // bool isLocal = builder.Configuration.GetValue<bool>("AppSettings:IsLocal");
 
-bool isLocal = true;
+bool isLocal = false;
 // bool isLocal = false;
 // true la local host
 // false la server

@@ -1455,7 +1455,38 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.Sle
             }
         }
 
+        public async Task<BulkResetFromFilterTableResultDto> funImplementationServicesSingleResetFilterCellsAsync(string Ssh_Host_IP)
+        {
 
+            try
+            {
+                
+                var sshResult = await funImplementationServiceExecuteSystemSshRebootServerAPIDEV(Ssh_Host_IP, "toor4nsn", "oZPS0POrRieRtu");
+
+                
+                Debug.WriteLine($"📡 Starting user reset for  sites...");
+                Console.WriteLine($"📡 Starting user reset for  sites...");
+
+                return new BulkResetFromFilterTableResultDto
+                {
+                    Success = true,
+                    Message = "Reset completed successfully"
+                };
+            }
+            catch (Exception sshEx)
+            {
+                Debug.WriteLine($"🔌 SSH verification failed: {sshEx.Message}");
+
+
+                return new BulkResetFromFilterTableResultDto
+                {
+                    Success = false,
+                    Message = $"Reset failed: {sshEx.Message}"
+                };
+            }
+        }
+
+        
 
 
 

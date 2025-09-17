@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +18,14 @@ namespace ClassLibraryRnocDataCenterWebDataClass.WebAPIASPModelsEntities.NSN.Sle
         public string DatabaseName { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public string SslMode { get; set; } = "Prefer";
-        public bool TrustServerCertificate { get; set; } = true;
+        [Column("ssl_mode")]
+        [StringLength(20)]
+        public string? SslMode { get; set; } = "Prefer"; // Default value
+
+        [Column("trust_server_certificate")]
+        public string? TrustServerCertificate { get; set; } = "true"; // Default value
+        [Column("active")]
+        public bool? Active { get; set; }
+
     }
 }

@@ -5,11 +5,11 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
 {
     [ApiController]
     [Route("api/nsn/sleeping-cell")]
-    public class NsnSleepingCellBulkResetApiController : ControllerBase
+    public class SleepingCellProcessResetApiController : ControllerBase
     {
         private readonly InterfaceResetService _resetService;
 
-        public NsnSleepingCellBulkResetApiController(InterfaceResetService resetService)
+        public SleepingCellProcessResetApiController(InterfaceResetService resetService)
         {
             _resetService = resetService;
         }
@@ -56,6 +56,88 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
             }
         }
 
+
+        [HttpPost("SleepingCell-reset-mannual")]
+
+            public async Task<IActionResult> SingleResetAllCells([FromBody] ManualResetRequest request)
+        {
+            try
+            {
+                // var result = await _resetService.funImplementationServicesResetAllFilterTableCellsAsync("SYSTEM_N8N_RESET");
+                // var result = await _resetService.funImplementationServicesResetAllFilterTableCellsAsync("SYSTEM_N8N_RESET");
+                // Call reset service với cell cụ thể
+                // Validate: phải có ít nhất 1 trong 3 parameters
+                /*
+                if (string.IsNullOrEmpty(request.CellName) &&
+                    string.IsNullOrEmpty(request.MrbtsName) &&
+                    !request.MrbtsId.HasValue)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "At least one of CellName, MrbtsName, or MrbtsId must be provided"
+                    });
+                }
+                */
+
+                if (string.IsNullOrEmpty(request.Ssh_Host_IP))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Station IP address is required"
+                    });
+                }
+                // Truyền trực tiếp IP vào service
+                var result = await _resetService.funImplementationServicesSingleResetFilterCellsAsync(request.Ssh_Host_IP);
+
+                if (result.Success)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        message = $"Reset completed for IP: {request.Ssh_Host_IP}"
+                    });
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = $"Reset failed for IP: {request.Ssh_Host_IP}"
+                    });
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"User mannual reset failed: {ex.Message}",
+                    error = ex.ToString()
+                });
+            }
+        }
+
+        // Tạo file Models/ManualResetRequest.cs hoặc thêm vào file Models có sẵn
+        public class ManualResetRequest
+        {
+            // public string? CellName { get; set; }
+            // public string? MrbtsName { get; set; }
+            // public int? MrbtsId { get; set; }  // ← Phải là int? (nullable)
+            // public string TriggeredBy { get; set; } 
+            // public string ResetReason { get; set; }
+            // = "MANUAL_USER_RESET";
+            public DateTime Timestamp { get; set; }
+
+            public string Ssh_Host_IP { get; set; }  // Chỉ cần IP trạm
+        }
+
+
+        /*
+
         /// <summary>
         /// Get status of filter table (optional - for checking before reset)
         /// </summary>
@@ -80,5 +162,6 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
                 });
             }
         }
+        */
     }
 }

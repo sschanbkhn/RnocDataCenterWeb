@@ -35,6 +35,8 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Interfaces.NSN.Sleeping
         // Task<BulkResetFromFilterTableResultDto> funImplementationServicesResetAllFilterTableCellsAsync(string executedBy = "N8N");
         Task<BulkResetFromFilterTableResultDto> funImplementationServicesResetAllFilterTableCellsAsync(string executedBy = "SYSTEM-N8N");
 
+        Task<BulkResetFromFilterTableResultDto> funImplementationServicesSingleResetFilterCellsAsync(string Ssh_Host_IP_Process);
+
     }
 }
 

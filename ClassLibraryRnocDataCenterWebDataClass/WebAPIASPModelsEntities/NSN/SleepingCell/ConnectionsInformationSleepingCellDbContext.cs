@@ -935,6 +935,8 @@ public partial class ConnectionsInformationSleepingCellDbContext : DbContext
                 .HasColumnName("todayanalysis");
         });
 
+
+
         modelBuilder.Entity<Outlook>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("sleepingcell_outlook_pkey");
@@ -949,6 +951,46 @@ public partial class ConnectionsInformationSleepingCellDbContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("password");
             entity.Property(e => e.SttEmail).HasColumnName("sttEmail");
+        });
+
+
+        modelBuilder.Entity<Objtabledatabaseinfor>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("objtabledatabaseinfor_pkey");
+            entity.ToTable("objtabledatabaseinfor", "system_nsn_sleepingcell");
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.SttDatabaseConfig).HasColumnName("stt_database_config");
+            entity.Property(e => e.ConnectionName)
+                .HasMaxLength(100)
+                .HasColumnName("connection_name");
+            entity.Property(e => e.Host)
+                .HasMaxLength(255)
+                .HasColumnName("host");
+            entity.Property(e => e.Port)
+                .HasColumnName("port")
+                .HasDefaultValue(5432);
+            entity.Property(e => e.DatabaseName)
+                .HasMaxLength(100)
+                .HasColumnName("database_name");
+            entity.Property(e => e.Username)
+                .HasMaxLength(100)
+                .HasColumnName("username");
+            entity.Property(e => e.Password)
+                .HasMaxLength(255)
+                .HasColumnName("password");
+            entity.Property(e => e.SslMode)
+                .HasMaxLength(20)
+                .HasColumnName("ssl_mode")
+                .HasDefaultValue("Prefer");
+            entity.Property(e => e.TrustServerCertificate)
+                .HasColumnName("trust_server_certificate")
+                .HasDefaultValue(true);
+            entity.Property(e => e.Active)
+               .HasColumnName("active");
+
         });
 
         modelBuilder.Entity<Tablefilepath>(entity =>
@@ -1014,6 +1056,9 @@ public partial class ConnectionsInformationSleepingCellDbContext : DbContext
                 .HasColumnName("vendor");
         });
 
+
+
+
         modelBuilder.Entity<VKpiResultToday>(entity =>
         {
             entity
@@ -1044,6 +1089,20 @@ public partial class ConnectionsInformationSleepingCellDbContext : DbContext
                 .HasMaxLength(20)
                 .HasColumnName("vendor");
         });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         OnModelCreatingPartial(modelBuilder);
     }

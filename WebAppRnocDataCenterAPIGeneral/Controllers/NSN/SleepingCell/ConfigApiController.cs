@@ -58,17 +58,38 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
         public async Task<IActionResult> CreateOutlookConfig([FromBody] Outlook config) // ✅ Entity trực tiếp
 
         {
+            config.Id = 0; // Reset Id về 0
+
+            // Đảm bảo EF coi đây là entity mới
+            // _context.Entry(config).State = EntityState.Added;   // _context.Outlooks.Add(config);
+
             try
             {
 
-                    _context.Outlooks.Add(config);
-                    await _context.SaveChangesAsync();
+
+                _context.Outlooks.Add(config);
+
+                await _context.SaveChangesAsync();
                     return CreatedAtAction(nameof(GetOutlookConfig), new { id = config.Id }, config);
 
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                // Lấy inner exception sâu nhất
+                var innerMost = ex;
+                while (innerMost.InnerException != null)
+                {
+                    innerMost = innerMost.InnerException;
+                }
+
+                return BadRequest(new
+                {
+                    error = ex.Message,
+                    innerError = ex.InnerException?.Message,
+                    innerMostError = innerMost.Message,
+                    stackTrace = ex.StackTrace,
+                    type = ex.GetType().Name
+                });
             }
         }
 

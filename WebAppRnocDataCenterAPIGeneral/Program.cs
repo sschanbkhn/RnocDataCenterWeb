@@ -16,6 +16,7 @@ using ClassLibraryRnocDataCenterWebDataClass.Repositories.Interfaces.NSN.Sleepin
 using ClassLibraryRnocDataCenterWebDataClass.Repositories.Implementations.NSN.SleepingCell;
 using ClassLibraryRnocDataCenterWebDataClass.Repositories.Interfaces.NSN;
 using Microsoft.Win32;
+using Microsoft.AspNetCore.Http.Features;
 
 
 
@@ -28,7 +29,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Đọc cấu hình IsLocal từ appsettings.Local.json
 // bool isLocal = builder.Configuration.GetValue<bool>("AppSettings:IsLocal");
 
-bool isLocal = false;
+bool isLocal = true;
 // bool isLocal = false;
 // true la local host
 // false la server
@@ -51,6 +52,10 @@ else
     strInformationProductionConnection = "Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;Username=rnoc1_dbthem;Password=Automation@123;SSL Mode=Prefer;Trust Server Certificate=true;";
     // Console.WriteLine("✅ Đang chạy: SERVER MODE");
 }
+
+// ✅ THÊM DÒNG NÀY
+builder.Configuration["ConnectionStrings:InformationProductionConnection"] = strInformationProductionConnection;
+
 
 // Console.WriteLine($"Connection: {strInformationProductionConnection}");
 // Console.WriteLine("=== END ===");
@@ -87,7 +92,16 @@ builder.Services.AddDbContext<ConnectionsInformationSleepingCellDbContext>(optio
 
 
 
+// Thêm đoạn này
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 2_147_483_648; // 2GB
+});
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 2_147_483_648; // 2GB
+});
 
 
 
@@ -152,6 +166,9 @@ builder.Services.AddDbContext<ConnectionsInformationSleepingCellDbContext>(optio
     options.UseNpgsql(strConnectionStringsDB));
 
 */
+
+
+
 
 
 builder.Services.AddControllers();

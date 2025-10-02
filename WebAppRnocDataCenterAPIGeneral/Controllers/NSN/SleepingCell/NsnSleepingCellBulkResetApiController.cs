@@ -57,33 +57,34 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
         }
 
 
-        [HttpPost("SleepingCell-reset-mannual")]
+        [HttpPost("SleepingCell-reset-mannual/{Ssh_Host_Ip_Mrbts}")]
 
-            public async Task<IActionResult> SingleResetAllCells([FromBody] ManualResetRequest request)
+            // public async Task<IActionResult> SingleResetAllCells([FromBody] ManualResetRequest request)
+            public async Task<IActionResult> SingleResetAllCells(string Ssh_Host_Ip_Mrbts)
         {
             try
             {
                 // var result = await _resetService.funImplementationServicesResetAllFilterTableCellsAsync("SYSTEM_N8N_RESET");
-                
+                // chi dung 2 API 
 
 
-                if (string.IsNullOrEmpty(request.Ssh_Host_IP))
+                if (string.IsNullOrEmpty(Ssh_Host_Ip_Mrbts))
                 {
                     return BadRequest(new
                     {
                         success = false,
-                        message = "Station IP address is required"
+                        message = "Station Ssh IP address is required for reboot"
                     });
                 }
                 // Truyền trực tiếp IP vào service
-                var result = await _resetService.funImplementationServicesSingleResetFilterCellsAsync(request.Ssh_Host_IP);
+                var result = await _resetService.funImplementationServicesSingleResetFilterCellsAsync(Ssh_Host_Ip_Mrbts);
 
                 if (result.Success)
                 {
                     return Ok(new
                     {
                         success = true,
-                        message = $"Reset completed for IP: {request.Ssh_Host_IP}"
+                        message = $"Reset completed for IP: {Ssh_Host_Ip_Mrbts}"
                     });
                 }
                 else
@@ -91,7 +92,7 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
                     return BadRequest(new
                     {
                         success = false,
-                        message = $"Reset failed for IP: {request.Ssh_Host_IP}"
+                        message = $"Reset failed for IP: {Ssh_Host_Ip_Mrbts}"
                     });
                 }
 
@@ -109,6 +110,7 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
         }
 
         // Tạo file Models/ManualResetRequest.cs hoặc thêm vào file Models có sẵn
+        /*
         public class ManualResetRequest
         {
             // public string? CellName { get; set; }
@@ -121,6 +123,8 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.SleepingCell
 
             public string Ssh_Host_IP { get; set; }  // Chỉ cần IP trạm
         }
+
+        */
 
 
         /*

@@ -944,8 +944,8 @@ public partial class ConnectionsInformationSleepingCellDbContext : DbContext
             entity.ToTable("outlook", "system_nsn_sleepingcell");
 
             entity.Property(e => e.Id)
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("ID");
+                .HasColumnName("ID")
+                .UseIdentityByDefaultColumn();  // Thay vì ValueGeneratedOnAdd()
             entity.Property(e => e.Email).HasMaxLength(150);
             entity.Property(e => e.Password)
                 .HasMaxLength(255)

@@ -776,11 +776,14 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
         {
             try
             {
-                var (xmlContent, fileName) = await GenerateActiveCRXMLFileService(date);
-
+                // var (xmlContent, fileName) = await GenerateActiveCRXMLFileService(date);
+                // var (xmlContent, fileName, localFilePath, subfolderName, planName) = await GenerateActiveCRXMLFileService(date);
+                // (string xmlContent, string fileName, string localFilePath, string subfolderName, string planName) = await GenerateActiveCRXMLFileService(date);
+                var result = await GenerateActiveCRXMLFileService(date);
                 // Return file XML để download
-                var bytes = System.Text.Encoding.UTF8.GetBytes(xmlContent);
-                return File(bytes, "application/xml", fileName);
+                // var bytes = System.Text.Encoding.UTF8.GetBytes(xmlContent);
+                // return File(bytes, "application/xml", result.fileName);
+                return result;
             }
             catch (Exception ex)
             {
@@ -802,7 +805,9 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
         /// <returns>Tuple (xmlContent, fileName)</returns>
 
 
-        private async Task<(string xmlContent, string fileName)> GenerateActiveCRXMLFileService(string? date = null)
+        // private async Task<(string xmlContent, string fileName)> GenerateActiveCRXMLFileService(string? date = null)
+            // private async Task<(string xmlContent, string fileName, string localFilePath, string subfolderName, string planName)> GenerateXML(string? date = null)
+        private async Task<IActionResult> GenerateActiveCRXMLFileService(string? date = null)
         {
 
             try
@@ -1033,7 +1038,43 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
                     await System.IO.File.WriteAllTextAsync(localFilePath, xmlContent);
                     //========================================================================
 
-                    return (xmlContent, fileName);
+
+                    // Upload lên OSS
+                    var ossFilePath = UploadToOSSService(localFilePath, fileName, subfolderName);
+                    //========================================================================
+
+                    // BƯỚC 3: Execute trên OSS
+                    // var planName = fileName.Replace(".xml", "");
+                    var (importResult, provisionResult) = ExecuteXMLOnOSSService(ossFilePath, planName);
+
+                    // Lưu log vào database
+                    await SaveExecutionLogtoDbService(fileName, localFilePath, ossFilePath, planName, importResult, provisionResult);
+
+
+                    // Lưu log vào database
+                    var importStatus = importResult.Contains("Status received: Finished") ? "Success" : "Failed";
+                    var provisionStatus = provisionResult.Contains("Status received: Finished") ? "Success" : "Failed";
+
+
+                    // return (xmlContent, fileName);
+                    // Return kết quả
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "XML exported and executed successfully",
+                        data = new
+                        {
+                            fileName = fileName,
+                            localPath = localFilePath,
+                            ossPath = ossFilePath,
+                            planName = planName,
+                            importStatus = importResult.Contains("Status received: Finished") ? "Success" : "Failed",
+                            provisionStatus = provisionResult.Contains("Status received: Finished") ? "Success" : "Failed",
+                            importLog = importResult,
+                            provisionLog = provisionResult
+                        }
+                    });
+                    //========================================================================
                 }
                 //========================================================================
 
@@ -1062,13 +1103,244 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
             public string NrControl { get; set; }
             public string Operation { get; set; }
         }
+        //========================================================================
+
+
+        //========================================================================
+        // HÀM 2: UPLOAD FILE LÊN OSS
+        //========================================================================
+        /// <summary>
+        /// Upload file XML lên OSS Final folder với subfolder theo timestamp
+        /// </summary>
+        /// <param name="localFilePath">Đường dẫn file XML local</param>
+        /// <param name="fileName">Tên file</param>
+        /// <param name="subfolderName">Tên subfolder (yyyyMMdd_HHmmss)</param>
+        /// <returns>Đường dẫn file trên OSS</returns>
+
+        private string UploadToOSSService(string localFilePath, string fileName, string subfolderName)
+        {
+            try
+            {
+                var sftpHost = "10.149.186.20";
+                var sftpUser = "bvthem";
+                var sftpPass = "Bk123456-";
+                var sftpPort = 22;
+                var ossBaseFolder = "/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Schan/CDS/SRANPRBsLoadCells/PRBscellIndOffValueFileCR/";
+
+                using (var sftpClient = new SftpClient(sftpHost, sftpPort, sftpUser, sftpPass))
+                {
+                    sftpClient.Connect();
+
+                    // Kiểm tra kết nối
+                    if (!sftpClient.IsConnected)
+                    {
+                        throw new Exception("Cannot connect to OSS server. Please check network connection.");
+                    }
+
+                    // Tạo subfolder trên OSS
+                    var ossSubfolder = ossBaseFolder + subfolderName;
+
+                    if (!sftpClient.Exists(ossSubfolder))
+                    {
+                        sftpClient.CreateDirectory(ossSubfolder);
+                    }
+                    //========================================================================
+
+                    // Đường dẫn file đầy đủ trên OSS
+                    var ossFilePath = ossSubfolder + "/" + fileName;
+                    //========================================================================
+
+                    // Upload file
+                    using (var fileStream = System.IO.File.OpenRead(localFilePath))
+                    {
+                        sftpClient.UploadFile(fileStream, ossFilePath);
+                    }
+                    //========================================================================
+
+
+
+                    sftpClient.Disconnect();
+
+                    return ossFilePath;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"UploadToOSS failed: {ex.Message}", ex);
+            }
+        }
+        //========================================================================
+
+        //========================================================================
+        // HÀM 3: EXECUTE XML ON OSS (Import + Provision)
+        //========================================================================
+        /// <summary>
+        /// SSH vào OSS và chạy 2 lệnh Import + Provision
+        /// </summary>
+        /// <param name="ossFilePath">Đường dẫn file XML trên OSS</param>
+        /// <param name="planName">Tên plan</param>
+        /// <returns>Tuple (importResult, provisionResult)</returns>
+
+        private (string importResult, string provisionResult) ExecuteXMLOnOSSService(string ossFilePath, string planName)
+        {
+            try
+            {
+                var sshHost = "10.149.186.20";
+                var sshUser = "bvthem";
+                var sshPass = "Bk123456-";
+                var sshPort = 22;
+                //========================================================================
+
+                using (var sshClient = new SshClient(sshHost, sshPort, sshUser, sshPass))
+                {
+                    sshClient.Connect();
+
+                    // Kiểm tra kết nối
+                    if (!sshClient.IsConnected)
+                    {
+                        throw new Exception("Cannot connect to OSS server via SSH. Please check network connection.");
+                    }
+
+
+
+                    // Tạo timestamp cho plan execution
+                    var execTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                    var fullPlanName = $"{planName}_{execTimestamp}";
+                    var backupPlanName = $"{fullPlanName}_bu";
+
+                    // LỆNH 1: Import
+                    var importCommand = $@"racclimx.sh -op Import \
+-type plan \
+-planName {fullPlanName} \
+-inputFile {ossFilePath} \
+-UIValues true \
+-rejectPlanIfAuditFails false \
+-v";
+                    //========================================================================
+
+                    // 🔧 Chuẩn hóa command trước khi gửi qua SSH (loại bỏ \r\n)
+                    importCommand = importCommand.Replace("\r", "").Replace("\n", " ").Replace("\\", " ");
+
+                    var importCmd = sshClient.CreateCommand(importCommand);
+
+
+
+                    var importResult = importCmd.Execute();
+                    //========================================================================
+
+                    if (importCmd.ExitStatus != 0)
+                    {
+                        throw new Exception($"Import failed with exit code {importCmd.ExitStatus}: {importResult}");
+                    }
+                    //========================================================================
+                    // Kiểm tra log có "Status received: Finished" không
+                    if (!importResult.Contains("Status received: Finished"))
+                    {
+                        throw new Exception($"Import did not finish successfully. Log: {importResult}");
+                    }
 
 
 
 
+                    // LỆNH 2: Provision
+                    var provisionCommand = $@"racclimx.sh -op Provision \
+-planName {fullPlanName} \
+-createBackupPlan true \
+-backupPlanName {backupPlanName} \
+-provisioningOperation activate \
+-provisionOnlyAfterSuccessfulValidationForLTE false \
+-validateBeforePreactivationForLTE false \
+-v";
+                    //========================================================================
+
+                    // 🔧 Chuẩn hóa command trước khi gửi qua SSH (loại bỏ \r\n)
+                    provisionCommand = provisionCommand.Replace("\n", "").Replace("\r", " ").Replace("\\", " ");
+
+                    var provisionCmd = sshClient.CreateCommand(provisionCommand);
 
 
 
+
+                    var provisionResult = provisionCmd.Execute();
+                    //========================================================================
+
+                    if (provisionCmd.ExitStatus != 0)
+                    {
+                        throw new Exception($"Provision failed with exit code {provisionCmd.ExitStatus}: {provisionResult}");
+                    }
+                    //========================================================================
+                    // Kiểm tra log có "Status received: Finished" không
+                    if (!provisionResult.Contains("Status received: Finished"))
+                    {
+                        throw new Exception($"Provision did not finish successfully. Log: {provisionResult}");
+                    }
+
+
+
+                    sshClient.Disconnect();
+                    //========================================================================
+
+                    return (importResult, provisionResult);
+                }
+                //========================================================================
+
+            }
+
+            //========================================================================
+            catch (Exception ex)
+            {
+                throw new Exception($"ExecuteXMLOnOSS failed: {ex.Message}", ex);
+            }
+            //========================================================================
+        }
+        //========================================================================
+
+
+        //========================================================================
+        // HÀM: LƯU LOG EXECUTION VÀO DATABASE
+        //========================================================================
+        private async Task SaveExecutionLogtoDbService(string fileName, string localFilePath, string ossFilePath,
+            string planName, string importResult, string provisionResult)
+        {
+            try
+            {
+                var importStatus = importResult.Contains("Status received: Finished") ? "Success" : "Failed";
+                var provisionStatus = provisionResult.Contains("Status received: Finished") ? "Success" : "Failed";
+
+                var insertLogQuery = @"
+            INSERT INTO system_nsn_prbsloadcell.objtablekpiprbsloadcellsindoffvalueprocessdataExecutionLogs
+            (date_executed, file_name, local_path, oss_path, plan_name, import_status, provision_status, import_log, provision_log)
+            VALUES (@DateExecuted, @FileName, @LocalPath, @OssPath, @PlanName, @ImportStatus, @ProvisionStatus, @ImportLog, @ProvisionLog)";
+
+                var _connectionString = _config.GetConnectionString("InformationProductionConnection");
+                // var _connectionString = _configuration.GetConnectionString("InformationProductionConnection");
+
+                using (var connection = new NpgsqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (var command = new NpgsqlCommand(insertLogQuery, connection))
+                    {
+                        command.Parameters.AddWithValue("@DateExecuted", DateTime.Now);
+                        command.Parameters.AddWithValue("@FileName", fileName);
+                        command.Parameters.AddWithValue("@LocalPath", localFilePath);
+                        command.Parameters.AddWithValue("@OssPath", ossFilePath);
+                        command.Parameters.AddWithValue("@PlanName", planName);
+                        command.Parameters.AddWithValue("@ImportStatus", importStatus);
+                        command.Parameters.AddWithValue("@ProvisionStatus", provisionStatus);
+                        command.Parameters.AddWithValue("@ImportLog", importResult ?? "");
+                        command.Parameters.AddWithValue("@ProvisionLog", provisionResult ?? "");
+
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error nhưng không throw để không ảnh hưởng flow chính
+                Console.WriteLine($"SaveExecutionLog error: {ex.Message}");
+            }
+        }
 
 
     }

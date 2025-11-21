@@ -84,9 +84,11 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
                 //========================================================================
 
                 var successCells = await GetCount(connection,
-                    "SELECT COUNT(*) FROM system_nsn_prbsloadcell.objtablekpiprbsloadcellsdataresolved WHERE period_start_time::date = @date",
+                    "SELECT COUNT(*) FROM system_nsn_prbsloadcell.objtablekpiprbsloadcellsdataresolvedlogs WHERE period_start_time::date = @date",
                     selectedDate);
                 //========================================================================
+
+
 
                 var newCells = await GetCount(connection,
                     "SELECT COUNT(*) FROM system_nsn_prbsloadcell.objtablekpiprbsloadcellsdataappnew WHERE period_start_time::date = @date",
@@ -112,7 +114,7 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
                 //========================================================================
 
                 var yesterdaySuccess = await GetCount(connection,
-                    "SELECT COUNT(*) FROM system_nsn_prbsloadcell.objtablekpiprbsloadcellsdataresolved WHERE period_start_time::date = @date",
+                    "SELECT COUNT(*) FROM system_nsn_prbsloadcell.objtablekpiprbsloadcellsdataresolvedlogs WHERE period_start_time::date = @date",
                     yesterday);
                 //========================================================================
 
@@ -224,7 +226,7 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
                         break;
 
                     case "success":
-                        tableName = "system_nsn_prbsloadcell.objtablekpiprbsloadcellsdataresolved";
+                        tableName = "system_nsn_prbsloadcell.objtablekpiprbsloadcellsdataresolvedlogs";
                         query = BuildSelectQuery(tableName, "period_start_time::date = @date");
                         break;
 
@@ -1561,6 +1563,8 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
                     }
                 });
             }
+            //========================================================================
+
             catch (Exception ex)
             {
                 return StatusCode(500, new
@@ -1570,6 +1574,69 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
                 });
             }
         }
+        //========================================================================
+
+        //========================================================================
+        // API: GET CR EXECUTION DATES
+        //========================================================================
+
+
+
+        [HttpGet("cr-logs-dates")]
+        public async Task<IActionResult> GetCRExecutionDates([FromQuery] string cellId, [FromQuery] string selectedDate)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(cellId))
+                {
+                    return BadRequest(new { message = "cellId parameter is required" });
+                }
+
+                if (string.IsNullOrEmpty(selectedDate))
+                {
+                    return BadRequest(new { message = "selectedDate parameter is required" });
+                }
+
+                using var connection = new NpgsqlConnection(_connectionString);
+                await connection.OpenAsync();
+
+                // Query để lấy các ngày thực hiện CR cho cell này
+                var query = @"
+            SELECT DISTINCT period_start_time::DATE as execution_date
+            FROM system_nsn_prbsloadcell.objtablekpiprbsloadcellsindoffvalueprocessdatacrlogs
+            WHERE (dnmrbtssran LIKE '%' || @cellId || '%' 
+               OR (@cellId LIKE '%' || ecgi_adj_enb_id || '%' AND @cellId LIKE '%' ||  ecgi_lcr_id || '%'))
+AND period_start_time::DATE >= @SelectedDate::DATE - INTERVAL '21 days'
+  AND period_start_time::DATE <= @SelectedDate::DATE
+            ORDER BY execution_date ASC
+        ";
+
+                using var cmd = new NpgsqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("CellId", cellId);
+                cmd.Parameters.AddWithValue("selecteddate", selectedDate);
+
+                var dates = new List<string>();
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    // var date = reader.GetDateTime(0).ToString("yyyy-MM-dd");
+                    var date = reader.GetDateTime(0).ToString("yyyy-MM-dd") + " 05:00";
+                    dates.Add(date);
+                }
+
+                return Ok(new { dates });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Error fetching CR execution dates",
+                    error = ex.Message
+                });
+            }
+        }
+        //========================================================================
 
 
 

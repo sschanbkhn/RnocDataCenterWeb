@@ -1,0 +1,584 @@
+<!DOCTYPE raml SYSTEM "raml20.dtd"[]>
+<raml version="2.0" xmlns="raml20.xsd">
+  <cmData type="plan" scope="all" name="SRAN_4G_cell_ind_off_20251121_104451_UPDATE" id="PlanConfiguration( 9729701 )">
+    <header>
+      <log dateTime="2025-11-07T10:02:11.000+07:00" action="created" appInfo="PlanExporter">UIValues are used</log>
+    </header>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-168073/LNBTS-168073/LNCEL-11/LNREL-387" id="54408173" operation="update">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160032/LNBTS-160032/LNCEL-12/LNREL-355" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160032/LNBTS-160032/LNCEL-12/LNREL-349" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160032/LNBTS-160032/LNCEL-12/LNREL-362" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160032/LNBTS-160032/LNCEL-12/LNREL-357" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160032/LNBTS-160032/LNCEL-12/LNREL-348" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160032/LNBTS-160032/LNCEL-12/LNREL-350" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160032/LNBTS-160032/LNCEL-12/LNREL-345" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160535/LNBTS-160535/LNCEL-32/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160535/LNBTS-160535/LNCEL-32/LNREL-382" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160535/LNBTS-160535/LNCEL-32/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160535/LNBTS-160535/LNCEL-32/LNREL-364" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160535/LNBTS-160535/LNCEL-32/LNREL-385" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160538/LNBTS-160538/LNCEL-53/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160921/LNBTS-160921/LNCEL-11/LNREL-360" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160921/LNBTS-160921/LNCEL-11/LNREL-372" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160921/LNBTS-160921/LNCEL-11/LNREL-362" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-170333/LNBTS-170333/LNCEL-12/LNREL-370" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-170333/LNBTS-170333/LNCEL-12/LNREL-368" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-170939/LNBTS-170939/LNCEL-12/LNREL-371" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180269/LNBTS-180269/LNCEL-11/LNREL-366" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180269/LNBTS-180269/LNCEL-11/LNREL-368" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180269/LNBTS-180269/LNCEL-11/LNREL-374" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180271/LNBTS-180271/LNCEL-12/LNREL-381" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180271/LNBTS-180271/LNCEL-12/LNREL-380" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180271/LNBTS-180271/LNCEL-12/LNREL-382" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180271/LNBTS-180271/LNCEL-12/LNREL-370" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180271/LNBTS-180271/LNCEL-12/LNREL-372" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180280/LNBTS-180280/LNCEL-16/LNREL-382" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180280/LNBTS-180280/LNCEL-16/LNREL-383" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180331/LNBTS-180331/LNCEL-11/LNREL-374" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180331/LNBTS-180331/LNCEL-11/LNREL-367" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180331/LNBTS-180331/LNCEL-11/LNREL-352" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180331/LNBTS-180331/LNCEL-11/LNREL-359" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180331/LNBTS-180331/LNCEL-11/LNREL-362" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180331/LNBTS-180331/LNCEL-11/LNREL-357" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180468/LNBTS-180468/LNCEL-11/LNREL-382" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180468/LNBTS-180468/LNCEL-11/LNREL-381" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180468/LNBTS-180468/LNCEL-11/LNREL-385" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180779/LNBTS-180779/LNCEL-12/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180825/LNBTS-180825/LNCEL-13/LNREL-383" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180879/LNBTS-180879/LNCEL-33/LNREL-378" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181119/LNBTS-181119/LNCEL-13/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181119/LNBTS-181119/LNCEL-13/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181119/LNBTS-181119/LNCEL-13/LNREL-384" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181213/LNBTS-181213/LNCEL-12/LNREL-374" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181213/LNBTS-181213/LNCEL-12/LNREL-370" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181213/LNBTS-181213/LNCEL-12/LNREL-376" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181213/LNBTS-181213/LNCEL-12/LNREL-379" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181213/LNBTS-181213/LNCEL-12/LNREL-385" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181213/LNBTS-181213/LNCEL-12/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181213/LNBTS-181213/LNCEL-12/LNREL-380" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240070/LNBTS-240070/LNCEL-13/LNREL-355" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240070/LNBTS-240070/LNCEL-13/LNREL-308" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240070/LNBTS-240070/LNCEL-13/LNREL-313" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240070/LNBTS-240070/LNCEL-13/LNREL-373" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240070/LNBTS-240070/LNCEL-13/LNREL-295" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240070/LNBTS-240070/LNCEL-13/LNREL-310" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240070/LNBTS-240070/LNCEL-13/LNREL-361" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240115/LNBTS-240115/LNCEL-13/LNREL-364" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240115/LNBTS-240115/LNCEL-13/LNREL-363" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240120/LNBTS-240120/LNCEL-12/LNREL-363" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240120/LNBTS-240120/LNCEL-12/LNREL-371" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240120/LNBTS-240120/LNCEL-12/LNREL-358" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240120/LNBTS-240120/LNCEL-12/LNREL-366" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240120/LNBTS-240120/LNCEL-12/LNREL-377" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240120/LNBTS-240120/LNCEL-12/LNREL-378" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240120/LNBTS-240120/LNCEL-12/LNREL-356" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240122/LNBTS-240122/LNCEL-12/LNREL-380" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240122/LNBTS-240122/LNCEL-12/LNREL-370" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240144/LNBTS-240144/LNCEL-13/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240144/LNBTS-240144/LNCEL-13/LNREL-380" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240144/LNBTS-240144/LNCEL-13/LNREL-383" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240144/LNBTS-240144/LNCEL-13/LNREL-372" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240144/LNBTS-240144/LNCEL-13/LNREL-374" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240222/LNBTS-240222/LNCEL-14/LNREL-368" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240222/LNBTS-240222/LNCEL-14/LNREL-373" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240222/LNBTS-240222/LNCEL-14/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-241067/LNBTS-241067/LNCEL-13/LNREL-373" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-241067/LNBTS-241067/LNCEL-13/LNREL-372" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-241067/LNBTS-241067/LNCEL-13/LNREL-341" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-241067/LNBTS-241067/LNCEL-13/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-241067/LNBTS-241067/LNCEL-13/LNREL-350" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-241067/LNBTS-241067/LNCEL-13/LNREL-366" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-241067/LNBTS-241067/LNCEL-13/LNREL-365" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-250086/LNBTS-250086/LNCEL-11/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-250086/LNBTS-250086/LNCEL-11/LNREL-377" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320823/LNBTS-320823/LNCEL-33/LNREL-383" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320935/LNBTS-320935/LNCEL-12/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320935/LNBTS-320935/LNCEL-12/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320935/LNBTS-320935/LNCEL-12/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320935/LNBTS-320935/LNCEL-12/LNREL-382" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320935/LNBTS-320935/LNCEL-12/LNREL-378" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320944/LNBTS-320944/LNCEL-33/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320944/LNBTS-320944/LNCEL-33/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320944/LNBTS-320944/LNCEL-33/LNREL-385" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320944/LNBTS-320944/LNCEL-33/LNREL-383" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320944/LNBTS-320944/LNCEL-33/LNREL-382" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-321232/LNBTS-321232/LNCEL-13/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-321232/LNBTS-321232/LNCEL-13/LNREL-378" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-321232/LNBTS-321232/LNCEL-13/LNREL-375" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-321232/LNBTS-321232/LNCEL-13/LNREL-382" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160535/LNBTS-160535/LNCEL-32/LNREL-372" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160535/LNBTS-160535/LNCEL-32/LNREL-359" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160538/LNBTS-160538/LNCEL-53/LNREL-385" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-160921/LNBTS-160921/LNCEL-11/LNREL-373" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-170333/LNBTS-170333/LNCEL-12/LNREL-380" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-170333/LNBTS-170333/LNCEL-12/LNREL-382" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-170939/LNBTS-170939/LNCEL-12/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180269/LNBTS-180269/LNCEL-11/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180271/LNBTS-180271/LNCEL-12/LNREL-384" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180280/LNBTS-180280/LNCEL-16/LNREL-385" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180331/LNBTS-180331/LNCEL-11/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180331/LNBTS-180331/LNCEL-11/LNREL-382" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180468/LNBTS-180468/LNCEL-11/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180779/LNBTS-180779/LNCEL-12/LNREL-384" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180779/LNBTS-180779/LNCEL-12/LNREL-383" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180825/LNBTS-180825/LNCEL-13/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180825/LNBTS-180825/LNCEL-13/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180879/LNBTS-180879/LNCEL-33/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180879/LNBTS-180879/LNCEL-33/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180879/LNBTS-180879/LNCEL-33/LNREL-383" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-180879/LNBTS-180879/LNCEL-33/LNREL-379" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181119/LNBTS-181119/LNCEL-13/LNREL-382" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181119/LNBTS-181119/LNCEL-13/LNREL-385" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-181213/LNBTS-181213/LNCEL-12/LNREL-384" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240070/LNBTS-240070/LNCEL-13/LNREL-372" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240070/LNBTS-240070/LNCEL-13/LNREL-338" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240120/LNBTS-240120/LNCEL-12/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240122/LNBTS-240122/LNCEL-12/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240122/LNBTS-240122/LNCEL-12/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240144/LNBTS-240144/LNCEL-13/LNREL-385" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240144/LNBTS-240144/LNCEL-13/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240222/LNBTS-240222/LNCEL-14/LNREL-374" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-240222/LNBTS-240222/LNCEL-14/LNREL-372" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-250086/LNBTS-250086/LNCEL-11/LNREL-329" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-250086/LNBTS-250086/LNCEL-11/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320823/LNBTS-320823/LNCEL-33/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">4dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320887/LNBTS-320887/LNCEL-11/LNREL-380" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320887/LNBTS-320887/LNCEL-11/LNREL-383" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320935/LNBTS-320935/LNCEL-12/LNREL-383" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-320944/LNBTS-320944/LNCEL-33/LNREL-388" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-321232/LNBTS-321232/LNCEL-13/LNREL-387" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+    <managedObject class="LNREL" version="FLF23R1_2221_11_2221_10" distName="PLMN-PLMN/MRBTS-321232/LNBTS-321232/LNCEL-13/LNREL-386" id="54408173" operation="update" xmlns="">
+      <p name="cellIndOffNeigh">2dB</p>
+      <p name="nrControl">automatic</p>
+    </managedObject>
+  </cmData>
+</raml>

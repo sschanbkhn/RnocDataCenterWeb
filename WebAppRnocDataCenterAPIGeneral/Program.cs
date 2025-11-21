@@ -44,12 +44,29 @@ if (isLocal)
     // LOCAL - Database của bạn
     // connectionString = "Host=localhost;Port=5432;Database=RnocDataCenter;Username=postgres;Password=Computer123456$;SSL Mode=Prefer;Trust Server Certificate=true;";
     strInformationProductionConnection = "Host=localhost;Port=5432;Database=RnocDataCenter;Username=postgres;Password=Computer123456$;SSL Mode=Prefer;Trust Server Certificate=true;";
+    // strInformationProductionConnection =
+    // "Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;Username=rnoc1_dbthem;Password=Automation@123;SSL Mode=Disable;Timeout=30;CommandTimeout=180;";
+
     // Console.WriteLine("✅ Đang chạy: LOCAL MODE");
 }
 else
 {
     // SERVER - Database production
-    strInformationProductionConnection = "Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;Username=rnoc1_dbthem;Password=Automation@123;SSL Mode=Prefer;Trust Server Certificate=true;";
+    // strInformationProductionConnection = "Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;Username=rnoc1_dbthem;Password=Automation@123;SSL Mode=Prefer;Trust Server Certificate=true;";
+    // strInformationProductionConnection =
+    // "Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;Username=rnoc1_dbthem;Password=Automation@123;SSL Mode=Disable;Timeout=30;CommandTimeout=180;";
+    /* strInformationProductionConnection =
+"Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;" +
+"Username=rnoc1_dbthem;Password=Automation@123;" +
+"SSL Mode=Disable;Trust Server Certificate=true;" +
+"Timeout=30;CommandTimeout=120;Tcp Keepalive=true;"; */
+
+    strInformationProductionConnection =
+"Host=10.155.43.204;Port=5432;Database=rnoc1_dbthem;" +
+"Username=rnoc1_dbthem;Password=Automation@123;" +
+"SSL Mode=Disable;" +  // Bỏ Trust Server Certificate
+"Timeout=60;CommandTimeout=300;";
+
     // Console.WriteLine("✅ Đang chạy: SERVER MODE");
 }
 
@@ -104,6 +121,17 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 
+
+// Cấu hình Kestrel để lắng nghe trên tất cả IP addresses
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5029); // HTTP
+    // serverOptions.ListenAnyIP(5001, listenOptions =>
+    serverOptions.ListenAnyIP(7232, listenOptions =>
+    {
+        listenOptions.UseHttps(); // HTTPS nếu cần
+    });
+});
 
 
 
@@ -185,6 +213,7 @@ builder.Services.AddCors(options =>
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
+    // chinh cho phep
 });
 
 
@@ -204,7 +233,7 @@ if (app.Environment.IsDevelopment())
 // Use CORS
 app.UseCors("AllowAllOrigins");
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

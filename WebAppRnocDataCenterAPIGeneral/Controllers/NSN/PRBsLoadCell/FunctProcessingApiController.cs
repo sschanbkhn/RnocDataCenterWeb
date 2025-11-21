@@ -108,7 +108,22 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
         {
             using var connection = new NpgsqlConnection(connectionString);
             await connection.OpenAsync();
+
+            // ✅ Thêm transaction
+            await using var transaction = await connection.BeginTransactionAsync();
+
+
             //========================================================================
+
+
+
+
+            // Truncate table trước
+            await using var cmdTruncateExecuted = new NpgsqlCommand(
+                "TRUNCATE TABLE system_nsn_prbsloadcell.objtablekpiprbsloadcellsdata",
+                connection
+            );
+            await cmdTruncateExecuted.ExecuteNonQueryAsync();
 
             using var reader = new StreamReader(fileStream);
             using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -124,10 +139,14 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
             await csv.ReadAsync();
             csv.ReadHeader();
 
+
+
             var totalRows = 0;
             var batch = new List<CsvRow>();
-            var batchSize = 1000;
+            var batchSize = 10000;
             //========================================================================
+
+
 
             while (await csv.ReadAsync())
             {
@@ -175,6 +194,11 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
                 totalRows += batch.Count;
             }
 
+
+
+            await transaction.CommitAsync();  // ← Commit cuối cùng
+
+
             return totalRows;
         }
         //========================================================================
@@ -192,6 +216,10 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
 
         private async Task BulkInsertAsync(NpgsqlConnection connection, List<CsvRow> batch)
         {
+
+ 
+
+
             using var writer = connection.BeginBinaryImport(
                 @"COPY system_nsn_prbsloadcell.objtablekpiprbsloadcellsdata 
                 (period_start_time, mrbts_name, lnbts_name, lncel_name, dn_mrbts_site,
@@ -285,7 +313,7 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
 
             var totalRows = 0;
             var batch = new List<HandoverRow>();
-            var batchSize = 5000;   // Batch lớn hơn vì handover data ít cột numeric hơn
+            var batchSize = 10000;   // Batch lớn hơn vì handover data ít cột numeric hơn
             //========================================================================
 
 
@@ -1046,10 +1074,42 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
                     // BƯỚC 3: Execute trên OSS
                     // var planName = fileName.Replace(".xml", "");
                     var (importResult, provisionResult) = ExecuteXMLOnOSSService(ossFilePath, planName);
+                    //========================================================================
 
                     // Lưu log vào database
-                    await SaveExecutionLogtoDbService(fileName, localFilePath, ossFilePath, planName, importResult, provisionResult);
+                    // await SaveExecutionLogtoDbService(fileName, localFilePath, ossFilePath, planName, importResult, provisionResult);
+                    // Lưu log vào database
+                    DateTime periodDate;
 
+
+
+
+                        // ✅ LẤY PERIOD TỪ BẢNG DATA (thay vì từ CRlogs)
+                        if (string.IsNullOrEmpty(date))
+                        {
+                            var maxDateQuery = @"
+            SELECT MAX(period_start_time::DATE) 
+            FROM system_nsn_prbsloadcell.objtablekpiprbsloadcellsdata";
+
+                            using (var cmd = new NpgsqlCommand(maxDateQuery, connection))
+                            {
+                                var result = await cmd.ExecuteScalarAsync();
+
+                                if (result == null || result == DBNull.Value)
+                                {
+                                    throw new Exception("No data found in objtablekpiprbsloadcellsdata table");
+                                }
+
+                                periodDate = (DateTime)result;
+                            }
+                        }
+                        else
+                        {
+                            periodDate = DateTime.Parse(date);
+                        }
+                    
+                    await SaveExecutionLogtoDbService(fileName, localFilePath, ossFilePath, planName, importResult, provisionResult, periodDate);
+                    //========================================================================
 
                     // Lưu log vào database
                     var importStatus = importResult.Contains("Status received: Finished") ? "Success" : "Failed";
@@ -1300,7 +1360,7 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
         // HÀM: LƯU LOG EXECUTION VÀO DATABASE
         //========================================================================
         private async Task SaveExecutionLogtoDbService(string fileName, string localFilePath, string ossFilePath,
-            string planName, string importResult, string provisionResult)
+            string planName, string importResult, string provisionResult, DateTime Period)
         {
             try
             {
@@ -1321,7 +1381,11 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PRBsLoadCell
 
                     using (var command = new NpgsqlCommand(insertLogQuery, connection))
                     {
-                        command.Parameters.AddWithValue("@DateExecuted", DateTime.Now);
+                        // command.Parameters.AddWithValue("@DateExecuted", DateTime.Now);
+                        command.Parameters.AddWithValue("@DateExecuted", Period);
+
+
+
                         command.Parameters.AddWithValue("@FileName", fileName);
                         command.Parameters.AddWithValue("@LocalPath", localFilePath);
                         command.Parameters.AddWithValue("@OssPath", ossFilePath);

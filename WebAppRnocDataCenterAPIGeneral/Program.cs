@@ -29,8 +29,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Đọc cấu hình IsLocal từ appsettings.Local.json
 // bool isLocal = builder.Configuration.GetValue<bool>("AppSettings:IsLocal");
 
-bool isLocal = true;
-// bool isLocal = false;
+// bool isLocal = true;
+bool isLocal = false;
 // true la local host
 // false la server
 
@@ -122,16 +122,18 @@ builder.WebHost.ConfigureKestrel(options =>
 
 
 
+
 // Cấu hình Kestrel để lắng nghe trên tất cả IP addresses
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.ListenAnyIP(5029); // HTTP
+// builder.WebHost.ConfigureKestrel(serverOptions =>
+// {
+    // serverOptions.ListenAnyIP(5029); // HTTP
+    // serverOptions.ListenAnyIP(5029); // HTTP
     // serverOptions.ListenAnyIP(5001, listenOptions =>
-    serverOptions.ListenAnyIP(7232, listenOptions =>
-    {
-        listenOptions.UseHttps(); // HTTPS nếu cần
-    });
-});
+    // serverOptions.ListenAnyIP(7232, listenOptions =>
+    // {
+        // listenOptions.UseHttps(); // HTTPS nếu cần
+    // });
+// });
 
 
 
@@ -207,12 +209,26 @@ builder.Services.AddSwaggerGen();
 // Add CORS (optional - for frontend integration)
 builder.Services.AddCors(options =>
 {
+    /*
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:3000",
+                "http://127.0.0.1:3000",
+                "http://10.155.43.197"            // Production (port 80)
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+    */
     options.AddPolicy("AllowAllOrigins", builder =>
     {
         builder.AllowAnyOrigin()
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
+    
     // chinh cho phep
 });
 
@@ -232,6 +248,7 @@ if (app.Environment.IsDevelopment())
 
 // Use CORS
 app.UseCors("AllowAllOrigins");
+// app.UseCors("AllowFrontend");
 
 // app.UseHttpsRedirection();
 

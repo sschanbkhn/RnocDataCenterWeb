@@ -60,6 +60,8 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Ericsson\" />
+    <Folder Include="Controllers\NSN\PnP5GSRANDeclaration\ConfigPnP\" />
+    <Folder Include="Controllers\NSN\PnP5GSRANDeclaration\ConfigOnSite\" />
     <Folder Include="Controllers\OSS\" />
   </ItemGroup>
 

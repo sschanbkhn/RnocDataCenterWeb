@@ -17,6 +17,8 @@ using ClassLibraryRnocDataCenterWebDataClass.Repositories.Implementations.NSN.Sl
 using ClassLibraryRnocDataCenterWebDataClass.Repositories.Interfaces.NSN;
 using Microsoft.Win32;
 using Microsoft.AspNetCore.Http.Features;
+using ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.PnP5GSRANDeclaration;
+using ClassLibraryRnocDataCenterWebBusiness.Services.Interfaces.NSN.PnP5GSRANDeclaration;
 
 
 
@@ -164,6 +166,12 @@ builder.Services.AddScoped<InterfaceDashboardRepository, ImplementationDashboard
 builder.Services.AddScoped<InterfaceFilePathRepository, ImplementationFilePathRepository>();
 builder.Services.AddScoped<InterfaceSleepingCellArchiveRepository, ImplementationSleepingCellArchiveRepository>();
 
+
+
+
+
+
+
 // Ho?c n?u dùng builder pattern:
 builder.Services.AddScoped<InterfaceFilterTableRepository, ImplementationFilterTableRepository>();
 
@@ -171,6 +179,71 @@ builder.Services.AddScoped<InterfaceFilterTableRepository, ImplementationFilterT
 builder.Services.AddScoped<InterfaceDetailTableRepository, ImplementationDetailTableRepository>();
 
 
+
+// ====================================================================
+// Register Generator Service - ĐƠN GIẢN như R003
+// ====================================================================
+builder.Services.AddScoped<InterfaceGeneratorService, ImplementationGeneratorService>();
+
+// ====================================================================
+
+
+/*
+
+
+// Program.cs
+builder.Services.AddScoped<InterfaceGeneratorService, ImplementationGeneratorService>(provider =>
+{
+    // ✅ Dùng StackTrace để tìm Controllers folder
+    // Lấy path của assembly
+    var assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+    var appFolder = Path.GetDirectoryName(assemblyPath);
+
+    // Từ bin/Debug/net6.0 → lên 3 cấp về root project
+    var projectRoot = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(appFolder)));
+
+    var templatePath = Path.Combine(
+        projectRoot,
+        "Controllers",
+        "NSN",
+        "PnP5GSRANDeclaration",
+        "ConfigPnP"
+    );
+
+    var outputPath = Path.Combine(
+        projectRoot,
+        "Controllers",
+        "NSN",
+        "PnP5GSRANDeclaration",
+        "GeneratedXML"
+    );
+
+    return new ImplementationGeneratorService(templatePath, outputPath);
+});
+
+
+*/
+
+
+// ✅ DÙNG cách mới - Service tự lấy path:
+// builder.Services.AddScoped<InterfaceGeneratorService, ImplementationGeneratorService>();
+
+
+// ====================================================================
+// Register OSS Service - ĐƠN GIẢN như R003
+// ====================================================================
+builder.Services.AddScoped<InterfaceOSSService, ImplementationOSSService>();
+
+
+/*
+
+builder.Services.AddScoped<InterfaceOSSService, ImplementationOSSService>(provider =>
+{
+    var outputPath = GetGeneratedXMLPath();
+    return new ImplementationOSSService(outputPath); // ← Chỉ 1 param
+});
+
+*/
 
 // Add services to the container.
 // Configure Entity Framework v?i PostgreSQL

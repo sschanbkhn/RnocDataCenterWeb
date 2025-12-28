@@ -385,13 +385,16 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.PnP
                 // ✅ Dùng StartedAt và CompletedAt THẬT
                 if (status.StartedAt.HasValue)
                 {
-                    logContent.AppendLine($"Started: {status.StartedAt.Value:MM/dd/yyyy h:mm:ss tt}");
+                    var startedLocal = TimeZoneInfo.ConvertTimeFromUtc(status.StartedAt.Value, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+                    logContent.AppendLine($"Started: {startedLocal:MM/dd/yyyy h:mm:ss tt}");
                 }
 
                 if (status.CompletedAt.HasValue)
                 {
-                    logContent.AppendLine($"Completed: {status.CompletedAt.Value:MM/dd/yyyy h:mm:ss tt}");
+                    var completedLocal = TimeZoneInfo.ConvertTimeFromUtc(status.CompletedAt.Value, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+                    logContent.AppendLine($"Completed: {completedLocal:MM/dd/yyyy h:mm:ss tt}");
                 }
+            
                 else
                 {
                     logContent.AppendLine("Status: In progress...");

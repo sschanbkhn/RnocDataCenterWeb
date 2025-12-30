@@ -24,6 +24,7 @@
     <Compile Remove="Controllers\NSN\SleepingCell\WebApiBuildSleepingCellController_2.cs" />
     <Compile Remove="Controllers\NSN\SleepingCell\WebApiBuildSleepingCellController_3.cs" />
     <Compile Remove="Controllers\NSN\SleepingCell\WebApiCreateFilePathController.cs" />
+    <Compile Remove="Program_1.cs" />
   </ItemGroup>
 
   <ItemGroup>

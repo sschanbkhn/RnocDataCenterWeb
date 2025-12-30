@@ -21,6 +21,8 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PnP5GSRANDeclaration
         //========================================================================
 
 
+
+
         public PnP5GGeneratorApiController(IWebHostEnvironment env,
     InterfaceGeneratorService generatorService,
     InterfaceOSSService ossService)
@@ -39,12 +41,88 @@ namespace WebAppRnocDataCenterAPIGeneral.Controllers.NSN.PnP5GSRANDeclaration
                 "ConfigPnP"
             );
             */
-
+            /*
             // ✅ DÙNG StackTrace như R003:
             var currentFilePath = new System.Diagnostics.StackTrace(true).GetFrame(0).GetFileName();
             var controllerFolder = Path.GetDirectoryName(currentFilePath);
 
             _templateFolderPath = Path.Combine(controllerFolder, "ConfigPnP");
+            */
+
+            /*
+
+            // ✅ CHECK MÔI TRƯỜNG
+            if (isLocal != false)
+            {
+                // LOCAL: ConfigPnP trong source folder
+                /*
+                _templateFolderPath = Path.Combine(
+                    _env.ContentRootPath,
+                    "Controllers",
+                    "NSN",
+                    "PnP5GSRANDeclaration",
+                    "ConfigPnP"
+                );
+
+                
+
+                var currentFilePath = new System.Diagnostics.StackTrace(true).GetFrame(0).GetFileName();
+                var controllerFolder = Path.GetDirectoryName(currentFilePath);
+
+                _templateFolderPath = Path.Combine(controllerFolder, "ConfigPnP");
+
+            }
+            else
+            {
+
+                // ✅ DÙNG GetCurrentDirectory (giống PRBscellIndOffValueFileCR)
+                var basePath = Directory.GetCurrentDirectory();
+                _templateFolderPath = Path.Combine(basePath, "ConfigPnP");
+
+            }
+
+            */
+
+
+
+
+
+
+            // Path 1: Cùng cấp DLL (Ubuntu Server)
+            var path1 = Path.Combine(Directory.GetCurrentDirectory(), "ConfigPnP");
+
+            // Path 2: Trong Controllers (Local Development)
+            var path2 = Path.Combine(
+                _env.ContentRootPath,
+                "Controllers",
+                "NSN",
+                "PnP5GSRANDeclaration",
+                "ConfigPnP"
+            );
+
+            // Chọn folder tồn tại
+            if (Directory.Exists(path1))
+            {
+                _templateFolderPath = path1;
+                Console.WriteLine($"✅ Using Server path: {path1}");
+            }
+            else if (Directory.Exists(path2))
+            {
+                _templateFolderPath = path2;
+                Console.WriteLine($"✅ Using Local path: {path2}");
+            }
+            else
+            {
+                // Không tìm thấy cả 2 → Báo lỗi chi tiết
+                var errorMsg = $"ConfigPnP folder not found!\n" +
+                               $"  Tried path 1: {path1} (exists: {Directory.Exists(path1)})\n" +
+                               $"  Tried path 2: {path2} (exists: {Directory.Exists(path2)})";
+                Console.WriteLine($"❌ {errorMsg}");
+                throw new DirectoryNotFoundException(errorMsg);
+            }
+
+
+
         }
         //========================================================================
 

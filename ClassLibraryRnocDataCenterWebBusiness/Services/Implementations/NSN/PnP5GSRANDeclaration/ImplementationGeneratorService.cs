@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,6 +46,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.PnP
             _config = config;  // ← THÊM
             _connectionString = _config.GetConnectionString("InformationProductionConnection");  // ← THÊM
 
+            /*
 
             // Tự động tìm paths
             var assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -81,6 +83,81 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.PnP
             {
                 Directory.CreateDirectory(_outputFolderPath);
             }
+
+            */
+
+            // ✅ AUTO-DETECT: Thử 2 đường dẫn, cái nào tồn tại thì dùng
+
+
+            // ✅ AUTO-DETECT: Thử 2 đường dẫn, cái nào tồn tại thì dùng
+
+            // Path 1: Cùng cấp với DLL (Ubuntu Server)
+            var basePath = Directory.GetCurrentDirectory();
+            var path1Templates = Path.Combine(basePath, "ConfigPnP");
+            var path1Output = Path.Combine(basePath, "GeneratedXML");
+
+            // Path 2: Trong Controllers (Local Development)
+            var assemblyPath = Assembly.GetExecutingAssembly().Location;
+            var appFolder = Path.GetDirectoryName(assemblyPath);
+            // Try to find project root (but may fail on production)
+            string path2Templates = null;
+            string path2Output = null;
+
+            try
+            {
+                var projectRoot = Path.GetDirectoryName(
+                    Path.GetDirectoryName(
+                        Path.GetDirectoryName(appFolder)
+                    )
+                );
+
+                if (!string.IsNullOrEmpty(projectRoot))
+                {
+                    path2Templates = Path.Combine(projectRoot, "Controllers", "NSN", "PnP5GSRANDeclaration", "ConfigPnP");
+                    path2Output = Path.Combine(projectRoot, "Controllers", "NSN", "PnP5GSRANDeclaration", "GeneratedXML");
+                }
+            }
+            catch
+            {
+                // Ignore - path2 will be null
+            }
+
+            // Chọn template folder tồn tại
+            if (Directory.Exists(path1Templates))
+            {
+                _templateFolderPath = path1Templates;
+                _outputFolderPath = path1Output;
+                Console.WriteLine($"✅ Service using Server paths:");
+                Console.WriteLine($"   Templates: {path1Templates}");
+                Console.WriteLine($"   Output: {path1Output}");
+            }
+            else if (path2Templates != null && Directory.Exists(path2Templates))
+            {
+                _templateFolderPath = path2Templates;
+                _outputFolderPath = path2Output;
+                Console.WriteLine($"✅ Service using Local paths:");
+                Console.WriteLine($"   Templates: {path2Templates}");
+                Console.WriteLine($"   Output: {path2Output}");
+            }
+            else
+            {
+                // Không tìm thấy cả 2 → Báo lỗi chi tiết
+                var errorMsg = $"ConfigPnP folder not found!\n" +
+                               $"  Tried path 1: {path1Templates} (exists: {Directory.Exists(path1Templates)})\n" +
+                               $"  Tried path 2: {path2Templates ?? "null"} (exists: {(path2Templates != null ? Directory.Exists(path2Templates).ToString() : "N/A")})";
+                Console.WriteLine($"❌ {errorMsg}");
+                throw new DirectoryNotFoundException(errorMsg);
+            }
+
+            // Tạo output folder nếu chưa có
+            if (!Directory.Exists(_outputFolderPath))
+            {
+                Directory.CreateDirectory(_outputFolderPath);
+                Console.WriteLine($"✅ Created output folder: {_outputFolderPath}");
+            }
+
+
+
 
         }
 

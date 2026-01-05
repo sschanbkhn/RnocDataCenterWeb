@@ -1,14 +1,15 @@
-﻿using System;
+﻿using ClassLibraryRnocDataCenterWebBusiness.Services.Interfaces.NSN.PnP5GSRANDeclaration;
+using Renci.SshNet;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
+using System.Text;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ClassLibraryRnocDataCenterWebBusiness.Services.Interfaces.NSN.PnP5GSRANDeclaration;
-using Renci.SshNet;
-using System.Text;
 
 
 namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.PnP5GSRANDeclaration
@@ -33,6 +34,7 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.PnP
         {
             // _outputFolderPath = outputFolderPath;
             // Tự động tìm path GeneratedXML
+            /*
             var assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             var appFolder = Path.GetDirectoryName(assemblyPath);
             var projectRoot = Path.GetDirectoryName(
@@ -48,6 +50,59 @@ namespace ClassLibraryRnocDataCenterWebBusiness.Services.Implementations.NSN.PnP
                 "PnP5GSRANDeclaration",
                 "GeneratedXML"
             );
+            */
+
+            // ✅ AUTO-DETECT: Thử 2 đường dẫn, cái nào tồn tại thì dùng
+
+            // Path 1: Cùng cấp với DLL (Ubuntu Server)
+            var basePath = Directory.GetCurrentDirectory();
+            var path1Output = Path.Combine(basePath, "GeneratedXML");
+
+            // Path 2: Trong Controllers (Local Development)
+            var assemblyPath = Assembly.GetExecutingAssembly().Location;
+            var appFolder = Path.GetDirectoryName(assemblyPath);
+
+            string path2Output = null;
+            try
+            {
+                var projectRoot = Path.GetDirectoryName(
+                    Path.GetDirectoryName(
+                        Path.GetDirectoryName(appFolder)
+                    )
+                );
+
+                if (!string.IsNullOrEmpty(projectRoot))
+                {
+                    path2Output = Path.Combine(projectRoot, "Controllers", "NSN", "PnP5GSRANDeclaration", "GeneratedXML");
+                }
+            }
+            catch
+            {
+                // Ignore - path2 will be null
+            }
+
+            // Chọn output folder tồn tại
+            if (Directory.Exists(path1Output))
+            {
+                _outputFolderPath = path1Output;
+                Console.WriteLine($"✅ OSS Service using Server path: {path1Output}");
+            }
+            else if (path2Output != null && Directory.Exists(path2Output))
+            {
+                _outputFolderPath = path2Output;
+                Console.WriteLine($"✅ OSS Service using Local path: {path2Output}");
+            }
+            else
+            {
+                // Không tìm thấy cả 2 → Tạo path1 (server default)
+                _outputFolderPath = path1Output;
+                Directory.CreateDirectory(_outputFolderPath);
+                Console.WriteLine($"✅ OSS Service created output path: {path1Output}");
+            }
+
+
+
+
         }
 
 
